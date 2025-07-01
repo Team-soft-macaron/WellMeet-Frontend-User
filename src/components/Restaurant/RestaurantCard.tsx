@@ -23,7 +23,9 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant, onCl
       onMouseLeave={handleMouseLeave}
     >
       <div style={styles.imageContainer}>
-        {restaurant.image}
+        {restaurant.image && (
+          <img src={restaurant.image} alt={restaurant.name} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 8 }} />
+        )}
       </div>
       <div style={styles.content}>
         <div style={styles.name}>
@@ -53,31 +55,31 @@ const styles = {
     transition: theme.transition.default,
     transform: isPressed ? 'scale(0.98)' : 'scale(1)',
   }),
-  
+
   imageContainer: {
     fontSize: '32px',
     marginRight: theme.spacing.lg,
     width: '40px',
     textAlign: 'center' as const,
   },
-  
+
   content: {
     flex: 1,
   },
-  
+
   name: {
     fontSize: theme.typography.fontSize.regular,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.text,
     marginBottom: theme.spacing.xs,
   },
-  
+
   details: {
     fontSize: theme.typography.fontSize.medium,
     color: theme.colors.textSecondary,
     marginBottom: theme.spacing.xs,
   },
-  
+
   rating: {
     fontSize: theme.typography.fontSize.medium,
     color: theme.colors.primary,
