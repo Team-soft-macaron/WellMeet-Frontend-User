@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
-import type { RecommendFormData } from '../types';
 import { RecommendForm } from '../components/AIRecommend/RecommendForm';
 import { RestaurantListPage } from './RestaurantListPage';
+import type { Restaurant } from '../types';
 
 export const AIRecommendPage: React.FC = () => {
-  const [showRestaurants, setShowRestaurants] = useState(false);
+  const [restaurants, setRestaurants] = useState<Restaurant[] | null>(null);
 
-  const handleRecommend = (formData: RecommendFormData) => {
-    console.log('누구와 함께:', formData.withWhom);
-    console.log('어떠한 만남:', formData.meetingType);
-    console.log('분위기:', formData.atmosphere);
-    setShowRestaurants(true);
+  const handleRecommend = async (vibe: string) => {
+    try {
+      const res = await fetch(`/api/restaurant/recommend/${vibe}`);
+      if (!res.ok) throw new Error(await res.text() || "서버 오류");
+      const data = await res.json();
+      const normalized = Array.isArray(data)
+        ? data.map((r: any) => ({ ...r, image: r.mainImage || r.image }))
+        : [{ ...data, image: data.mainImage || data.image }];
+      setRestaurants(normalized);
+    } catch (e) {
+      alert('추천 실패');
+    }
   };
 
-  const handleBack = () => {
-    setShowRestaurants(false);
-  };
-
-  if (showRestaurants) {
-    return <RestaurantListPage onBack={handleBack} />;
+  if (restaurants) {
+    return <RestaurantListPage restaurants={restaurants} onBack={() => setRestaurants(null)} />;
   }
 
-  return <RecommendForm onSubmit={handleRecommend} />;
+  return (
+    <RecommendForm onRecommend={handleRecommend} />
+  );
 };
