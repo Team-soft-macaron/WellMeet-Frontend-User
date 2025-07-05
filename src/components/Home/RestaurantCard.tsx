@@ -4,7 +4,7 @@ import { theme } from '../../styles/theme';
 interface RestaurantCardProps {
   id: string;
   name: string;
-  category: string;
+  address: string;
   distance: string;
   rating: number;
   icon: string;
@@ -13,7 +13,7 @@ interface RestaurantCardProps {
 
 export const RestaurantCard: React.FC<RestaurantCardProps> = ({
   name,
-  category,
+  address,
   distance,
   rating,
   icon,
@@ -24,7 +24,7 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({
       <div style={styles.cardImage}>{icon}</div>
       <div style={styles.cardInfo}>
         <div style={styles.cardTitle}>{name}</div>
-        <div style={styles.cardDetail}>{category} • {distance} • ⭐ {rating}</div>
+        <div style={styles.cardDetail}>{address} • {distance} • ⭐ {rating}</div>
       </div>
     </div>
   );

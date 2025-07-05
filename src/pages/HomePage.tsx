@@ -8,7 +8,7 @@ const mockRestaurants = [
   {
     id: '1',
     name: '정식당',
-    category: '한식',
+    address: '강남구',
     distance: '500m',
     rating: 4.9,
     icon: '🍽️'
@@ -16,7 +16,7 @@ const mockRestaurants = [
   {
     id: '2',
     name: '한우 명가',
-    category: '한식',
+    address: '강남구',
     distance: '800m',
     rating: 4.7,
     icon: '🥩'
@@ -24,7 +24,7 @@ const mockRestaurants = [
   {
     id: '3',
     name: '비스트로 파리',
-    category: '프랑스',
+    address: '강남구',
     distance: '1.2km',
     rating: 4.6,
     icon: '🍷'
@@ -32,7 +32,7 @@ const mockRestaurants = [
   {
     id: '4',
     name: '스시 오마카세',
-    category: '일식',
+    address: '강남구',
     distance: '600m',
     rating: 4.8,
     icon: '🍣'
@@ -53,7 +53,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSearch, onRestaurantClick 
       <PremiumCard />
       
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>추천 맛집</h2>
+        <h2 style={styles.sectionTitle}>📍주변 추천 맛집</h2>
         {mockRestaurants.map((restaurant) => (
           <RestaurantCard
             key={restaurant.id}
