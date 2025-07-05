@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellmeet Premium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background-color: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Navigation */
+        .nav {
+            height: 60px;
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .nav-back {
+            position: absolute;
+            left: 20px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            position: absolute;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .nav-menu span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background-color: #333;
+            margin: 4px 0;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            height: 80px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .tab {
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+            padding: 5px;
+        }
+
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .tab-label {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .tab.active .tab-label {
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Components */
+        .search-bar {
+            width: 100%;
+            height: 50px;
+            background-color: #f5f5f5;
+            border-radius: 25px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-image {
+            width: 60px;
+            height: 60px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .card-detail {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .premium-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-card::before {
+            content: '✨';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 80px;
+            opacity: 0.1;
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background-color: #FFD700;
+            color: #333;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .button {
+            width: 100%;
+            height: 50px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #555;
+        }
+
+        .button.secondary {
+            background-color: #fff;
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        /* Chat Interface */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            font-size: 15px;
+        }
+
+        .chat-bubble.ai {
+            background-color: #f0f0f0;
+            margin-right: auto;
+        }
+
+        .chat-bubble.user {
+            background-color: #007AFF;
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            height: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 0 15px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .chat-send {
+            width: 40px;
+            height: 40px;
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Calendar */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .calendar-day:hover {
+            background-color: #f0f0f0;
+        }
+
+        .calendar-day.selected {
+            background-color: #007AFF;
+            color: white;
+            border-color: #007AFF;
+        }
+
+        /* Time slots */
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .time-slot {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .time-slot:hover {
+            background-color: #f0f0f0;
+        }
+
+        .time-slot.selected {
+            background-color: #007AFF;
+            color: white;
+            border-color: #007AFF;
+        }
+
+        .time-slot.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Premium options */
+        .premium-option {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .premium-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            margin-top: 2px;
+        }
+
+        .premium-option-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .premium-option-desc {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Home Screen -->
+            <div class="screen active" id="home">
+                <div class="nav">
+                    <div class="nav-title">Wellmeet Premium</div>
+                    <div class="nav-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="search-bar" onclick="showScreen('search')">
+                        <span style="color: #999;">식당 검색...</span>
+                        <span style="font-size: 20px;">🔍</span>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h2 style="font-size: 24px; margin-bottom: 5px;">유성민님 안녕하세요 👋</h2>
+                        <p style="color: #666;">오늘도 완벽한 모임을 도와드릴게요</p>
+                    </div>
+
+                    <div class="card premium-card" onclick="showScreen('ai-chat')" style="margin-bottom: 25px;">
+                        <div class="premium-badge">추천</div>
+                        <div class="card-image">🤖</div>
+                        <div class="card-info">
+                            <div class="card-title">AI 맞춤 추천 받기</div>
+                            <div class="card-detail" style="color: rgba(255,255,255,0.9);">상황에 딱 맞는 맛집을 찾아드려요</div>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 16px; margin-bottom: 15px;">📍 주변 추천 맛집</h3>
+
+                    <div class="card fade-in" onclick="showScreen('restaurant-detail', 'sushi-omakase')">
+                        <div class="card-image">🍣</div>
+                        <div class="card-info">
+                            <div class="card-title">스시 오마카세</div>
+                            <div class="card-detail">강남구 • 500m • ⭐ 4.8</div>
+                        </div>
+                    </div>
+
+                    <div class="card fade-in" style="animation-delay: 0.1s;"
+                        onclick="showScreen('restaurant-detail', 'hanwoo-house')">
+                        <div class="card-image">🥩</div>
+                        <div class="card-info">
+                            <div class="card-title">한우 명가</div>
+                            <div class="card-detail">강남구 • 800m • ⭐ 4.7</div>
+                        </div>
+                    </div>
+
+                    <div class="card fade-in" style="animation-delay: 0.2s;"
+                        onclick="showScreen('restaurant-detail', 'bistro-paris')">
+                        <div class="card-image">🍷</div>
+                        <div class="card-info">
+                            <div class="card-title">비스트로 파리</div>
+                            <div class="card-detail">강남구 • 1.2km • ⭐ 4.6</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab active" onclick="showScreen('home')">
+                        <div class="tab-icon">🏠</div>
+                        <div class="tab-label">홈</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('ai-chat')">
+                        <div class="tab-icon">🤖</div>
+                        <div class="tab-label">AI추천</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('reservations')">
+                        <div class="tab-icon">📋</div>
+                        <div class="tab-label">예약내역</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('mypage')">
+                        <div class="tab-icon">👤</div>
+                        <div class="tab-label">MY</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Screen -->
+            <div class="screen" id="search">
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">검색</div>
+                </div>
+                <div class="content">
+                    <div class="search-bar" style="border: 2px solid #007AFF;">
+                        <input type="text" id="search-input" placeholder="검색어를 입력하세요" style="font-size: 16px;"
+                            onkeypress="handleSearchKeyPress(event)">
+                        <span style="font-size: 20px; cursor: pointer;" onclick="performSearch()">🔍</span>
+                    </div>
+
+                    <div id="search-results" style="display: none;">
+                        <h4 style="margin-bottom: 15px;">검색 결과</h4>
+                        <div id="search-results-list"></div>
+                    </div>
+
+                    <div id="search-default">
+                        <div style="margin-bottom: 30px;">
+                            <h4 style="margin-bottom: 15px;">최근 검색어</h4>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <span
+                                    style="padding: 8px 15px; background-color: #f0f0f0; border-radius: 20px; font-size: 14px;">스시</span>
+                                <span
+                                    style="padding: 8px 15px; background-color: #f0f0f0; border-radius: 20px; font-size: 14px;">강남
+                                    한식</span>
+                                <span
+                                    style="padding: 8px 15px; background-color: #f0f0f0; border-radius: 20px; font-size: 14px;">프라이빗
+                                    룸</span>
+                            </div>
+                        </div>
+
+                        <h4 style="margin-bottom: 15px;">인기 검색어</h4>
+                        <div style="display: grid; gap: 10px;">
+                            <div style="display: flex; align-items: center; padding: 10px 0;">
+                                <span
+                                    style="font-weight: bold; color: #FF3B30; margin-right: 15px; width: 20px;">1</span>
+                                <span>비즈니스 미팅 맛집</span>
+                            </div>
+                            <div style="display: flex; align-items: center; padding: 10px 0;">
+                                <span
+                                    style="font-weight: bold; color: #FF3B30; margin-right: 15px; width: 20px;">2</span>
+                                <span>성수동 카페</span>
+                            </div>
+                            <div style="display: flex; align-items: center; padding: 10px 0;">
+                                <span
+                                    style="font-weight: bold; color: #FF3B30; margin-right: 15px; width: 20px;">3</span>
+                                <span>오마카세</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab active" onclick="showScreen('home')">
+                        <div class="tab-icon">🏠</div>
+                        <div class="tab-label">홈</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('ai-chat')">
+                        <div class="tab-icon">🤖</div>
+                        <div class="tab-label">AI추천</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('reservations')">
+                        <div class="tab-icon">📋</div>
+                        <div class="tab-label">예약내역</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('mypage')">
+                        <div class="tab-icon">👤</div>
+                        <div class="tab-label">MY</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chat Screen -->
+            <div class="screen" id="ai-chat">
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">AI 추천</div>
+                </div>
+                <div class="content"
+                    style="padding: 0; display: flex; flex-direction: column; height: calc(100% - 140px);">
+                    <div class="chat-messages" id="chat-messages" style="flex: 1; overflow-y: auto; padding: 20px;">
+                        <div class="chat-bubble ai fade-in">
+                            <div class="chat-name">AI 웰밋</div>
+                            안녕하세요! 완벽한 맛집을 찾아드리는 AI 웰밋입니다 🤖<br><br>
+                            어떤 모임을 준비하고 계신가요? 자유롭게 말씀해주세요!
+                        </div>
+                    </div>
+                    <div class="chat-input-container"
+                        style="position: relative; padding: 20px; background-color: #fff; border-top: 1px solid #e0e0e0;">
+                        <div class="chat-input-wrapper">
+                            <input type="text" class="chat-input" id="chat-input" placeholder="메시지를 입력하세요..."
+                                onkeypress="handleChatKeyPress(event)">
+                            <button class="chat-send" onclick="sendMessage()">➤</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab" onclick="showScreen('home')">
+                        <div class="tab-icon">🏠</div>
+                        <div class="tab-label">홈</div>
+                    </div>
+                    <div class="tab active">
+                        <div class="tab-icon">🤖</div>
+                        <div class="tab-label">AI추천</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('reservations')">
+                        <div class="tab-icon">📋</div>
+                        <div class="tab-label">예약내역</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('mypage')">
+                        <div class="tab-icon">👤</div>
+                        <div class="tab-label">MY</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restaurant Detail Screen -->
+            <div class="screen" id="restaurant-detail">
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">정식당</div>
+                </div>
+                <div class="content">
+                    <div
+                        style="width: 100%; height: 200px; background-color: #f0f0f0; margin: -20px -20px 20px -20px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        🍽️
+                    </div>
+
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+                        <div>
+                            <h2 style="font-size: 24px; margin-bottom: 5px;">정식당</h2>
+                            <p style="color: #666;">강남구 테헤란로 142</p>
+                        </div>
+                        <span style="font-size: 32px; color: #ccc; cursor: pointer;">☆</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                        <div style="text-align: center; padding: 15px; background-color: #f5f5f5; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold;">4.9</div>
+                            <div style="color: #666; font-size: 14px;">평점</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background-color: #f5f5f5; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold;">234</div>
+                            <div style="color: #666; font-size: 14px;">리뷰수</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 15px;">대표 메뉴</h3>
+                    <div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>런치 코스 A</span>
+                            <span style="font-weight: 600;">35,000원</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>런치 코스 B</span>
+                            <span style="font-weight: 600;">50,000원</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>디너 코스</span>
+                            <span style="font-weight: 600;">80,000원</span>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3>상황별 후기</h3>
+                        <span style="color: #007AFF; cursor: pointer;" onclick="showScreen('reviews')">더보기 ›</span>
+                    </div>
+
+                    <div class="card" style="background-color: #f9f9f9;">
+                        <span style="font-size: 24px; margin-right: 15px;">💼</span>
+                        <div>
+                            <strong>비즈니스 미팅</strong><br>
+                            <span style="font-size: 14px; color: #666;">"조용한 룸, 완벽한 서비스로 계약 성공!"</span>
+                        </div>
+                    </div>
+
+                    <div class="card" style="background-color: #f9f9f9;">
+                        <span style="font-size: 24px; margin-right: 15px;">❤️</span>
+                        <div>
+                            <strong>데이트</strong><br>
+                            <span style="font-size: 14px; color: #666;">"분위기 좋고 음식도 맛있어요. 프로포즈 성공!"</span>
+                        </div>
+                    </div>
+
+                    <button class="button" onclick="showScreen('booking')">예약하기</button>
+                </div>
+            </div>
+
+            <!-- Booking Screen -->
+            <div class="screen" id="booking">
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">예약하기</div>
+                </div>
+                <div class="content">
+                    <div class="card" style="background-color: #f5f5f5; border: none;">
+                        <div>
+                            <h3 style="margin-bottom: 5px;">정식당 예약</h3>
+                            <p style="color: #666; font-size: 14px;">AI가 분석한 최적 시간대</p>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom: 10px;">날짜 선택</h4>
+                    <div class="calendar">
+                        <div class="calendar-day">월</div>
+                        <div class="calendar-day">화</div>
+                        <div class="calendar-day">수</div>
+                        <div class="calendar-day">목</div>
+                        <div class="calendar-day">금</div>
+                        <div class="calendar-day">토</div>
+                        <div class="calendar-day">일</div>
+                        <div class="calendar-day">15</div>
+                        <div class="calendar-day">16</div>
+                        <div class="calendar-day selected">17</div>
+                        <div class="calendar-day">18</div>
+                        <div class="calendar-day">19</div>
+                        <div class="calendar-day">20</div>
+                        <div class="calendar-day">21</div>
+                    </div>
+
+                    <h4 style="margin-bottom: 10px;">시간 선택</h4>
+                    <div class="time-grid">
+                        <div class="time-slot">11:30</div>
+                        <div class="time-slot">12:00</div>
+                        <div class="time-slot selected">12:30</div>
+                        <div class="time-slot disabled">13:00</div>
+                        <div class="time-slot">18:00</div>
+                        <div class="time-slot">18:30</div>
+                        <div class="time-slot">19:00</div>
+                        <div class="time-slot disabled">19:30</div>
+                    </div>
+
+                    <h4 style="margin-bottom: 10px;">인원</h4>
+                    <select
+                        style="width: 100%; height: 45px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 0 15px; font-size: 16px; margin-bottom: 20px;">
+                        <option>2명</option>
+                        <option>3명</option>
+                        <option selected>4명</option>
+                        <option>5명</option>
+                        <option>6명</option>
+                    </select>
+
+                    <div style="background-color: #FFF9E6; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px;">
+                            <span
+                                style="background-color: #FFD700; padding: 4px 10px; border-radius: 20px; font-size: 12px;">Premium</span>
+                            추가 옵션
+                        </h4>
+                        <div class="premium-option">
+                            <input type="checkbox" id="welcome-drink">
+                            <label for="welcome-drink">
+                                <div class="premium-option-title">웰컴 드링크 서비스</div>
+                                <div class="premium-option-desc">샴페인 또는 논알콜 음료 제공</div>
+                            </label>
+                        </div>
+                        <div class="premium-option">
+                            <input type="checkbox" id="vip-room">
+                            <label for="vip-room">
+                                <div class="premium-option-title">VIP 룸 업그레이드</div>
+                                <div class="premium-option-desc">프라이빗 공간, 전담 서버 배정</div>
+                            </label>
+                        </div>
+                        <div class="premium-option">
+                            <input type="checkbox" id="valet">
+                            <label for="valet">
+                                <div class="premium-option-title">발렛 파킹 서비스</div>
+                                <div class="premium-option-desc">무료 발렛 파킹 제공</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="button" onclick="confirmBooking()">예약 확정</button>
+                </div>
+            </div>
+
+            <!-- My Page Screen -->
+            <div class="screen" id="mypage">
+                <div class="nav">
+                    <div class="nav-title">마이 페이지</div>
+                    <div class="nav-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="content">
+                    <div
+                        style="display: flex; align-items: center; margin-bottom: 30px; padding: 20px; background-color: #f5f5f5; border-radius: 12px;">
+                        <div
+                            style="width: 60px; height: 60px; background-color: #007AFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 32px; color: white;">
+                            👤
+                        </div>
+                        <div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">유성민</div>
+                            <div style="color: #666;">Premium Member</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-image">👤</div>
+                        <div class="card-info">
+                            <div class="card-title">내 정보</div>
+                            <div class="card-detail">프로필 및 계정 관리</div>
+                        </div>
+                        <span style="color: #666;">›</span>
+                    </div>
+
+                    <div class="card" onclick="showScreen('reservations')">
+                        <div class="card-image">📋</div>
+                        <div class="card-info">
+                            <div class="card-title">예약 내역</div>
+                            <div class="card-detail">지난 예약 및 리뷰 관리</div>
+                        </div>
+                        <span style="color: #666;">›</span>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-image">🎁</div>
+                        <div class="card-info">
+                            <div class="card-title">이벤트/혜택</div>
+                            <div class="card-detail">프리미엄 회원 전용 혜택</div>
+                        </div>
+                        <span style="color: #666;">›</span>
+                    </div>
+
+                    <div class="card" onclick="showScreen('favorites')">
+                        <div class="card-image">⭐</div>
+                        <div class="card-info">
+                            <div class="card-title">즐겨찾기</div>
+                            <div class="card-detail">자주 가는 맛집 목록</div>
+                        </div>
+                        <span style="color: #666;">›</span>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-image">⚙️</div>
+                        <div class="card-info">
+                            <div class="card-title">설정</div>
+                            <div class="card-detail">알림, 언어, 로그아웃</div>
+                        </div>
+                        <span style="color: #666;">›</span>
+                    </div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab" onclick="showScreen('home')">
+                        <div class="tab-icon">🏠</div>
+                        <div class="tab-label">홈</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('ai-chat')">
+                        <div class="tab-icon">🤖</div>
+                        <div class="tab-label">AI추천</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('reservations')">
+                        <div class="tab-icon">📋</div>
+                        <div class="tab-label">예약내역</div>
+                    </div>
+                    <div class="tab active">
+                        <div class="tab-icon">👤</div>
+                        <div class="tab-label">MY</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reservations Screen -->
+            <div class="screen" id="reservations">
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">예약 내역</div>
+                </div>
+                <div class="content">
+                    <h3 style="margin-bottom: 20px;">전체 예약 내역</h3>
+
+                    <h4 style="font-size: 14px; color: #666; margin-bottom: 15px;">2024년 12월 17일 (오늘)</h4>
+                    <div class="card" style="background-color: #f9f9f9;"
+                        onclick="showScreen('reservation-detail', 'R2024121700123')">
+                        <div
+                            style="width: 50px; height: 50px; background-color: #007AFF; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white;">
+                            <div style="text-align: center;">
+                                <div style="font-weight: bold;">17</div>
+                                <div style="font-size: 10px;">12월</div>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title">정식당</div>
+                            <div class="card-detail">12:30 • 4명 • 비즈니스 미팅</div>
+                        </div>
+                        <span style="font-size: 12px; color: #007AFF;">예정</span>
+                    </div>
+
+                    <h4 style="font-size: 14px; color: #666; margin: 20px 0 15px;">2024년 12월 10일</h4>
+                    <div class="card" onclick="showScreen('reservation-detail', 'R2024121000456')">
+                        <div
+                            style="width: 50px; height: 50px; background-color: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                            <div style="text-align: center;">
+                                <div style="font-weight: bold;">10</div>
+                                <div style="font-size: 10px;">12월</div>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title">스시 오마카세</div>
+                            <div class="card-detail">19:00 • 2명 • 기념일</div>
+                            <div style="color: #FFD700; font-size: 14px;">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <span style="font-size: 12px; color: #666;">완료</span>
+                    </div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab" onclick="showScreen('home')">
+                        <div class="tab-icon">🏠</div>
+                        <div class="tab-label">홈</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('ai-chat')">
+                        <div class="tab-icon">🤖</div>
+                        <div class="tab-label">AI추천</div>
+                    </div>
+                    <div class="tab active">
+                        <div class="tab-icon">📋</div>
+                        <div class="tab-label">예약내역</div>
+                    </div>
+                    <div class="tab" onclick="showScreen('mypage')">
+                        <div class="tab-icon">👤</div>
+                        <div class="tab-label">MY</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Screen -->
+            <div class="screen" id="reviews">
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">리뷰</div>
+                </div>
+                <div class="content">
+                    <div style="padding: 15px; background-color: #f5f5f5; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="margin-bottom: 5px;">정식당</h3>
+                        <p style="color: #666; font-size: 14px;">강남구 테헤란로 142</p>
+                        <div style="display: flex; align-items: center; margin-top: 10px;">
+                            <span style="font-size: 24px; font-weight: bold; margin-right: 10px;">4.9</span>
+                            <span style="color: #FFD700;">⭐⭐⭐⭐⭐</span>
+                            <span style="color: #666; margin-left: 10px; font-size: 14px;">(리뷰 234개)</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto;">
+                        <span
+                            style="padding: 8px 15px; background-color: #007AFF; color: white; border-radius: 20px; font-size: 14px; white-space: nowrap;">전체</span>
+                        <span
+                            style="padding: 8px 15px; background-color: #f0f0f0; border-radius: 20px; font-size: 14px; white-space: nowrap;">비즈니스
+                            미팅</span>
+                        <span
+                            style="padding: 8px 15px; background-color: #f0f0f0; border-radius: 20px; font-size: 14px; white-space: nowrap;">데이트</span>
+                        <span
+                            style="padding: 8px 15px; background-color: #f0f0f0; border-radius: 20px; font-size: 14px; white-space: nowrap;">가족
+                            모임</span>
+                    </div>
+
+                    <div class="card" style="padding: 20px;">
+                        <div style="width: 100%;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <div style="display: flex; align-items: center;">
+                                    <div
+                                        style="width: 40px; height: 40px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                                        👤</div>
+                                    <div>
+                                        <div style="font-weight: 600;">김영희</div>
+                                        <div style="font-size: 12px; color: #666;">비즈니스 미팅 • 2024.12.15</div>
+                                    </div>
+                                </div>
+                                <div style="color: #FFD700;">⭐⭐⭐⭐⭐</div>
+                            </div>
+                            <p style="line-height: 1.5; margin-bottom: 10px;">
+                                중요한 계약 미팅이 있어서 예약했는데 정말 만족스러웠습니다. 프라이빗 룸이 완전히 독립되어 있어서 대화 내용이 밖으로 새어나갈 걱정이 없었고, 직원분들이
+                                적절한 타이밍에 서비스해주셔서 미팅이 끊기지 않았어요.
+                            </p>
+                            <div style="display: flex; gap: 5px;">
+                                <span
+                                    style="font-size: 12px; background-color: #f0f0f0; padding: 4px 10px; border-radius: 15px;">#프라이빗룸</span>
+                                <span
+                                    style="font-size: 12px; background-color: #f0f0f0; padding: 4px 10px; border-radius: 15px;">#비즈니스미팅</span>
+                                <span
+                                    style="font-size: 12px; background-color: #f0f0f0; padding: 4px 10px; border-radius: 15px;">#서비스최고</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reservation Detail Screen -->
+            <div class="screen" id="reservation-detail">
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">예약 상세</div>
+                </div>
+                <div class="content">
+                    <div
+                        style="text-align: center; padding: 20px; background-color: #007AFF; color: white; margin: -20px -20px 20px -20px;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">예약 확정</div>
+                        <div style="font-size: 14px;">예약번호: R2024121700123</div>
+                    </div>
+
+                    <h4 style="margin-bottom: 15px;">식당 정보</h4>
+                    <div class="card" style="margin-bottom: 20px;">
+                        <div class="card-image">🍽️</div>
+                        <div class="card-info">
+                            <div class="card-title">정식당</div>
+                            <div class="card-detail">강남구 • ⭐ 4.9</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom: 15px;">예약 정보</h4>
+                    <div style="background-color: #f5f5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <span style="color: #666;">예약일시</span>
+                            <span style="font-weight: 600;">2024년 12월 17일 (화) 12:30</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <span style="color: #666;">인원</span>
+                            <span style="font-weight: 600;">4명</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">목적</span>
+                            <span style="font-weight: 600;">비즈니스 미팅</span>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom: 15px;">특별 요청사항</h4>
+                    <div style="background-color: #f5f5f5; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                        <p style="line-height: 1.5;">조용한 프라이빗 룸으로 준비 부탁드립니다. 중요한 계약 미팅이 있습니다.</p>
+                    </div>
+
+                    <h4 style="margin-bottom: 15px;">
+                        <span
+                            style="background-color: #FFD700; padding: 4px 10px; border-radius: 20px; font-size: 12px;">Premium</span>
+                        추가 서비스
+                    </h4>
+                    <div style="background-color: #f5f5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span style="color: #007AFF; margin-right: 10px;">✓</span>
+                            <span>웰컴 드링크 서비스</span>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <span style="color: #007AFF; margin-right: 10px;">✓</span>
+                            <span>발렛 파킹 서비스</span>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom: 15px;">위치 안내</h4>
+                    <div
+                        style="width: 100%; height: 150px; background-color: #f0f0f0; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <span style="font-size: 32px;">📍</span>
+                        <div
+                            style="position: absolute; bottom: 10px; left: 10px; background-color: white; padding: 5px 10px; border-radius: 8px; font-size: 12px;">
+                            강남구 테헤란로 142
+                        </div>
+                    </div>
+
+                    <button class="button secondary" style="margin-bottom: 10px;">예약 변경</button>
+                    <button class="button" style="background-color: #FF3B30; margin-top: 0;">예약 취소</button>
+                </div>
+            </div>
+
+            <!-- Favorites Screen -->
+            <div class="screen" id="favorites">
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">즐겨찾기</div>
+                </div>
+                <div class="content">
+                    <h3 style="margin-bottom: 20px;">내가 찜한 맛집</h3>
+
+                    <div class="card" onclick="showScreen('restaurant-detail', 'jungsikdang')">
+                        <div class="card-image">🍽️</div>
+                        <div class="card-info">
+                            <div class="card-title">정식당</div>
+                            <div class="card-detail">강남구 • ⭐ 4.9</div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="showScreen('restaurant-detail', 'sushi-omakase')">
+                        <div class="card-image">🍣</div>
+                        <div class="card-info">
+                            <div class="card-title">스시 오마카세</div>
+                            <div class="card-detail">강남구 • ⭐ 4.8</div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="showScreen('restaurant-detail', 'bistro-paris')">
+                        <div class="card-image">🍷</div>
+                        <div class="card-info">
+                            <div class="card-title">비스트로 드 욘트빌</div>
+                            <div class="card-detail">강남구 • ⭐ 4.5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 'home';
+        let screenHistory = ['home'];
+        let currentRestaurant = null;
+        let currentReservation = null;
+
+        // Restaurant data
+        const restaurants = {
+            'sushi-omakase': {
+                name: '스시 오마카세',
+                icon: '🍣',
+                area: '강남구',
+                address: '강남구 도산대로 123',
+                distance: '500m',
+                rating: '4.8',
+                reviewCount: '156',
+                isFavorite: false,
+                menu: [
+                    { name: '런치 오마카세', price: '50,000원' },
+                    { name: '디너 오마카세', price: '120,000원' },
+                    { name: '프리미엄 코스', price: '200,000원' }
+                ]
+            },
+            'hanwoo-house': {
+                name: '한우 명가',
+                icon: '🥩',
+                area: '강남구',
+                address: '강남구 압구정로 456',
+                distance: '800m',
+                rating: '4.7',
+                reviewCount: '298',
+                isFavorite: false,
+                menu: [
+                    { name: '한우 모둠 세트', price: '80,000원' },
+                    { name: '특선 한우 코스', price: '150,000원' },
+                    { name: '점심 특선', price: '35,000원' }
+                ]
+            },
+            'bistro-paris': {
+                name: '비스트로 파리',
+                icon: '🍷',
+                area: '강남구',
+                address: '강남구 청담동 789',
+                distance: '1.2km',
+                rating: '4.6',
+                reviewCount: '187',
+                isFavorite: false,
+                menu: [
+                    { name: '런치 코스', price: '45,000원' },
+                    { name: '디너 코스 A', price: '85,000원' },
+                    { name: '디너 코스 B', price: '120,000원' }
+                ]
+            },
+            'jungsikdang': {
+                name: '정식당',
+                icon: '🍽️',
+                area: '강남구',
+                address: '강남구 테헤란로 142',
+                distance: '',
+                rating: '4.9',
+                reviewCount: '234',
+                isFavorite: true,
+                menu: [
+                    { name: '런치 코스 A', price: '35,000원' },
+                    { name: '런치 코스 B', price: '50,000원' },
+                    { name: '디너 코스', price: '80,000원' }
+                ]
+            }
+        };
+
+        // Reservations data
+        let reservations = [
+            {
+                id: 'R2024121700123',
+                restaurantId: 'jungsikdang',
+                date: '2024년 12월 17일',
+                day: '17',
+                month: '12월',
+                time: '12:30',
+                people: '4명',
+                purpose: '비즈니스 미팅',
+                status: 'upcoming',
+                specialRequest: '조용한 프라이빗 룸으로 준비 부탁드립니다. 중요한 계약 미팅이 있습니다.',
+                premiumServices: ['웰컴 드링크 서비스', '발렛 파킹 서비스']
+            },
+            {
+                id: 'R2024121000456',
+                restaurantId: 'sushi-omakase',
+                date: '2024년 12월 10일',
+                day: '10',
+                month: '12월',
+                time: '19:00',
+                people: '2명',
+                purpose: '기념일',
+                status: 'completed',
+                rating: 5,
+                specialRequest: '창가 자리 부탁드립니다.',
+                premiumServices: ['샴페인 서비스']
+            }
+        ];
+
+        function showScreen(screenId, data = null) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Show selected screen
+            document.getElementById(screenId).classList.add('active');
+
+            // Update history
+            if (currentScreen !== screenId) {
+                screenHistory.push(screenId);
+                currentScreen = screenId;
+            }
+
+            // Handle screen-specific data
+            if (screenId === 'restaurant-detail' && data) {
+                showRestaurantDetail(data);
+            } else if (screenId === 'reservation-detail' && data) {
+                showReservationDetail(data);
+            } else if (screenId === 'booking' && data) {
+                showBooking(data);
+            }
+
+            // Update tab bar
+            updateTabBar(screenId);
+        }
+
+        function showRestaurantDetail(restaurantId) {
+            currentRestaurant = restaurants[restaurantId];
+            if (!currentRestaurant) return;
+
+            // Update restaurant detail screen
+            document.querySelector('#restaurant-detail .nav-title').textContent = currentRestaurant.name;
+            document.querySelector('#restaurant-detail .content').innerHTML = `
+                <div style="width: 100%; height: 200px; background-color: #f0f0f0; margin: -20px -20px 20px -20px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                    ${currentRestaurant.icon}
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="font-size: 24px; margin-bottom: 5px;">${currentRestaurant.name}</h2>
+                        <p style="color: #666;">${currentRestaurant.address}</p>
+                    </div>
+                    <span style="font-size: 32px; color: ${currentRestaurant.isFavorite ? '#FFD700' : '#ccc'}; cursor: pointer;" onclick="toggleFavorite('${restaurantId}')">
+                        ${currentRestaurant.isFavorite ? '★' : '☆'}
+                    </span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                    <div style="text-align: center; padding: 15px; background-color: #f5f5f5; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: bold;">${currentRestaurant.rating}</div>
+                        <div style="color: #666; font-size: 14px;">평점</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background-color: #f5f5f5; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: bold;">${currentRestaurant.reviewCount}</div>
+                        <div style="color: #666; font-size: 14px;">리뷰수</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 15px;">대표 메뉴</h3>
+                <div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    ${currentRestaurant.menu.map((item, index) => `
+                        <div style="display: flex; justify-content: space-between; ${index < currentRestaurant.menu.length - 1 ? 'margin-bottom: 10px;' : ''}">
+                            <span>${item.name}</span>
+                            <span style="font-weight: 600;">${item.price}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3>상황별 후기</h3>
+                    <span style="color: #007AFF; cursor: pointer;" onclick="showScreen('reviews')">더보기 ›</span>
+                </div>
+
+                <div class="card" style="background-color: #f9f9f9;">
+                    <span style="font-size: 24px; margin-right: 15px;">💼</span>
+                    <div>
+                        <strong>비즈니스 미팅</strong><br>
+                        <span style="font-size: 14px; color: #666;">"조용한 룸, 완벽한 서비스로 계약 성공!"</span>
+                    </div>
+                </div>
+
+                <div class="card" style="background-color: #f9f9f9;">
+                    <span style="font-size: 24px; margin-right: 15px;">❤️</span>
+                    <div>
+                        <strong>데이트</strong><br>
+                        <span style="font-size: 14px; color: #666;">"분위기 좋고 음식도 맛있어요. 프로포즈 성공!"</span>
+                    </div>
+                </div>
+
+                <button class="button" onclick="showScreen('booking', '${restaurantId}')">예약하기</button>
+            `;
+        }
+
+        function showReservationDetail(reservationId) {
+            const reservation = reservations.find(r => r.id === reservationId);
+            if (!reservation) return;
+
+            currentReservation = reservation;
+            const restaurant = restaurants[reservation.restaurantId];
+
+            document.querySelector('#reservation-detail .content').innerHTML = `
+                <div style="text-align: center; padding: 20px; background-color: ${reservation.status === 'upcoming' ? '#007AFF' : '#4CAF50'}; color: white; margin: -20px -20px 20px -20px;">
+                    <div style="font-size: 24px; margin-bottom: 5px;">${reservation.status === 'upcoming' ? '예약 확정' : '방문 완료'}</div>
+                    <div style="font-size: 14px;">예약번호: ${reservation.id}</div>
+                </div>
+
+                <h4 style="margin-bottom: 15px;">식당 정보</h4>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-image">${restaurant.icon}</div>
+                    <div class="card-info">
+                        <div class="card-title">${restaurant.name}</div>
+                        <div class="card-detail">${restaurant.area} • ⭐ ${restaurant.rating}</div>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom: 15px;">예약 정보</h4>
+                <div style="background-color: #f5f5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="color: #666;">예약일시</span>
+                        <span style="font-weight: 600;">${reservation.date} (${reservation.status === 'upcoming' ? '화' : '일'}) ${reservation.time}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="color: #666;">인원</span>
+                        <span style="font-weight: 600;">${reservation.people}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">목적</span>
+                        <span style="font-weight: 600;">${reservation.purpose}</span>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom: 15px;">특별 요청사항</h4>
+                <div style="background-color: #f5f5f5; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                    <p style="line-height: 1.5;">${reservation.specialRequest}</p>
+                </div>
+
+                <h4 style="margin-bottom: 15px;">
+                    <span style="background-color: #FFD700; padding: 4px 10px; border-radius: 20px; font-size: 12px;">Premium</span>
+                    추가 서비스
+                </h4>
+                <div style="background-color: #f5f5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    ${reservation.premiumServices.map(service => `
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span style="color: #007AFF; margin-right: 10px;">✓</span>
+                            <span>${service}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <h4 style="margin-bottom: 15px;">위치 안내</h4>
+                <div style="width: 100%; height: 150px; background-color: #f0f0f0; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; position: relative;">
+                    <span style="font-size: 32px;">📍</span>
+                    <div style="position: absolute; bottom: 10px; left: 10px; background-color: white; padding: 5px 10px; border-radius: 8px; font-size: 12px;">
+                        ${restaurant.address}
+                    </div>
+                </div>
+
+                ${reservation.status === 'upcoming' ? `
+                    <button class="button secondary" style="margin-bottom: 10px;" onclick="modifyReservation('${reservation.id}')">예약 변경</button>
+                    <button class="button" style="background-color: #FF3B30; margin-top: 0;" onclick="cancelReservation('${reservation.id}')">예약 취소</button>
+                ` : reservation.rating ? `
+                    <div style="text-align: center; padding: 20px; background-color: #f5f5f5; border-radius: 12px;">
+                        <p style="margin-bottom: 10px;">이미 방문하신 예약입니다</p>
+                        <div style="color: #FFD700; font-size: 24px;">${'⭐'.repeat(reservation.rating)}</div>
+                    </div>
+                ` : `
+                    <button class="button">리뷰 작성하기</button>
+                `}
+            `;
+        }
+
+        function showBooking(restaurantId) {
+            const restaurant = restaurants[restaurantId];
+            if (!restaurant) return;
+
+            document.querySelector('#booking .content').innerHTML = `
+                <div class="card" style="background-color: #f5f5f5; border: none;">
+                    <div>
+                        <h3 style="margin-bottom: 5px;">${restaurant.name} 예약</h3>
+                        <p style="color: #666; font-size: 14px;">AI가 분석한 최적 시간대</p>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom: 10px;">날짜 선택</h4>
+                <div class="calendar">
+                    <div class="calendar-day">월</div>
+                    <div class="calendar-day">화</div>
+                    <div class="calendar-day">수</div>
+                    <div class="calendar-day">목</div>
+                    <div class="calendar-day">금</div>
+                    <div class="calendar-day">토</div>
+                    <div class="calendar-day">일</div>
+                    <div class="calendar-day">15</div>
+                    <div class="calendar-day">16</div>
+                    <div class="calendar-day selected">17</div>
+                    <div class="calendar-day">18</div>
+                    <div class="calendar-day">19</div>
+                    <div class="calendar-day">20</div>
+                    <div class="calendar-day">21</div>
+                </div>
+
+                <h4 style="margin-bottom: 10px;">시간 선택</h4>
+                <div class="time-grid">
+                    <div class="time-slot">11:30</div>
+                    <div class="time-slot">12:00</div>
+                    <div class="time-slot selected">12:30</div>
+                    <div class="time-slot disabled">13:00</div>
+                    <div class="time-slot">18:00</div>
+                    <div class="time-slot">18:30</div>
+                    <div class="time-slot">19:00</div>
+                    <div class="time-slot disabled">19:30</div>
+                </div>
+
+                <h4 style="margin-bottom: 10px;">인원</h4>
+                <select id="booking-people" style="width: 100%; height: 45px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 0 15px; font-size: 16px; margin-bottom: 20px;">
+                    <option>2명</option>
+                    <option>3명</option>
+                    <option selected>4명</option>
+                    <option>5명</option>
+                    <option>6명</option>
+                </select>
+
+                <div style="background-color: #FFF9E6; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px;">
+                        <span style="background-color: #FFD700; padding: 4px 10px; border-radius: 20px; font-size: 12px;">Premium</span>
+                        추가 옵션
+                    </h4>
+                    <div class="premium-option">
+                        <input type="checkbox" id="welcome-drink">
+                        <label for="welcome-drink">
+                            <div class="premium-option-title">웰컴 드링크 서비스</div>
+                            <div class="premium-option-desc">샴페인 또는 논알콜 음료 제공</div>
+                        </label>
+                    </div>
+                    <div class="premium-option">
+                        <input type="checkbox" id="vip-room">
+                        <label for="vip-room">
+                            <div class="premium-option-title">VIP 룸 업그레이드</div>
+                            <div class="premium-option-desc">프라이빗 공간, 전담 서버 배정</div>
+                        </label>
+                    </div>
+                    <div class="premium-option">
+                        <input type="checkbox" id="valet">
+                        <label for="valet">
+                            <div class="premium-option-title">발렛 파킹 서비스</div>
+                            <div class="premium-option-desc">무료 발렛 파킹 제공</div>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="button" onclick="confirmBooking('${restaurantId}')">예약 확정</button>
+            `;
+
+            // Re-add event listeners for calendar and time slots
+            setTimeout(() => {
+                document.querySelectorAll('#booking .calendar-day').forEach(day => {
+                    if (!isNaN(day.textContent)) {
+                        day.addEventListener('click', function () {
+                            document.querySelectorAll('#booking .calendar-day').forEach(d => d.classList.remove('selected'));
+                            this.classList.add('selected');
+                        });
+                    }
+                });
+
+                document.querySelectorAll('#booking .time-slot').forEach(slot => {
+                    if (!slot.classList.contains('disabled')) {
+                        slot.addEventListener('click', function () {
+                            document.querySelectorAll('#booking .time-slot').forEach(s => s.classList.remove('selected'));
+                            this.classList.add('selected');
+                        });
+                    }
+                });
+            }, 100);
+        }
+
+        function goBack() {
+            if (screenHistory.length > 1) {
+                screenHistory.pop();
+                const previousScreen = screenHistory[screenHistory.length - 1];
+                currentScreen = previousScreen;
+                showScreen(previousScreen);
+            }
+        }
+
+        function updateTabBar(screenId) {
+            const tabScreenMap = {
+                'home': 0,
+                'ai-chat': 1,
+                'reservations': 2,
+                'mypage': 3
+            };
+
+            document.querySelectorAll('.tab').forEach((tab, index) => {
+                tab.classList.remove('active');
+            });
+
+            const activeTabIndex = tabScreenMap[screenId];
+            if (activeTabIndex !== undefined) {
+                document.querySelectorAll('.tab')[activeTabIndex].classList.add('active');
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+
+            if (message === '') return;
+
+            const chatMessages = document.getElementById('chat-messages');
+
+            // Add user message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble user fade-in';
+            userBubble.textContent = message;
+            chatMessages.appendChild(userBubble);
+
+            // Clear input
+            input.value = '';
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Show typing indicator
+            setTimeout(() => {
+                const typingBubble = document.createElement('div');
+                typingBubble.className = 'chat-bubble ai fade-in';
+                typingBubble.innerHTML = `
+                    <div class="chat-name">AI 웰밋</div>
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                chatMessages.appendChild(typingBubble);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Replace with actual response
+                setTimeout(() => {
+                    typingBubble.innerHTML = `
+                        <div class="chat-name">AI 웰밋</div>
+                        완벽해요! 특별한 날을 위한 로맨틱한 식당을 추천해드릴게요 ✨
+                    `;
+
+                    // Add restaurant recommendations
+                    const recommendations = document.createElement('div');
+                    recommendations.innerHTML = `
+                        <div style="margin: 15px 0;">
+                            <div class="card" style="margin-bottom: 10px;" onclick="showScreen('restaurant-detail', 'bistro-paris')">
+                                <div class="card-image">🍷</div>
+                                <div class="card-info">
+                                    <div class="card-title">비스트로 파리</div>
+                                    <div class="card-detail">프렌치 • 강남구 • ⭐ 4.6 • 💕 로맨틱</div>
+                                </div>
+                            </div>
+                            <div class="card" style="margin-bottom: 10px;" onclick="showScreen('restaurant-detail', 'sushi-omakase')">
+                                <div class="card-image">🍣</div>
+                                <div class="card-info">
+                                    <div class="card-title">스시 오마카세</div>
+                                    <div class="card-detail">오마카세 • 강남구 • ⭐ 4.8 • 🕯️ 프라이빗</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    chatMessages.appendChild(recommendations);
+
+                    // Add follow-up message
+                    const followUp = document.createElement('div');
+                    followUp.className = 'chat-bubble ai fade-in';
+                    followUp.innerHTML = `
+                        <div class="chat-name">AI 웰밋</div>
+                        이 중에서 특히 '비스트로 파리'는 커플석이 따로 마련되어 있고, 기념일 케이크 서비스도 제공해요!<br><br>
+                        예약을 도와드릴까요? 아니면 다른 옵션을 더 보시겠어요?
+                    `;
+                    chatMessages.appendChild(followUp);
+
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 2000);
+            }, 500);
+        }
+
+        function handleSearchKeyPress(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+
+        function performSearch() {
+            const searchInput = document.getElementById('search-input');
+            const searchQuery = searchInput.value.trim();
+
+            if (searchQuery === '') return;
+
+            const searchDefault = document.getElementById('search-default');
+            const searchResults = document.getElementById('search-results');
+            const searchResultsList = document.getElementById('search-results-list');
+
+            // Hide default content, show results
+            searchDefault.style.display = 'none';
+            searchResults.style.display = 'block';
+
+            // Clear previous results
+            searchResultsList.innerHTML = '';
+
+            // Search through restaurants
+            const searchResultsData = Object.entries(restaurants).filter(([id, restaurant]) =>
+                restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            if (searchResultsData.length === 0) {
+                searchResultsList.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #666;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🔍</div>
+                        <p style="font-size: 16px; margin-bottom: 10px;">검색 결과가 없습니다</p>
+                        <p style="font-size: 14px;">다른 검색어로 시도해보세요</p>
+                    </div>
+                `;
+            } else {
+                searchResultsData.forEach(([id, restaurant]) => {
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'card fade-in';
+                    resultCard.onclick = () => showScreen('restaurant-detail', id);
+                    resultCard.innerHTML = `
+                        <div class="card-image">${restaurant.icon}</div>
+                        <div class="card-info">
+                            <div class="card-title">${restaurant.name}</div>
+                            <div class="card-detail">${restaurant.area} • ⭐ ${restaurant.rating}</div>
+                        </div>
+                    `;
+                    searchResultsList.appendChild(resultCard);
+                });
+            }
+        }
+
+        function confirmBooking(restaurantId) {
+            const restaurant = restaurants[restaurantId];
+            const selectedDate = document.querySelector('#booking .calendar-day.selected').textContent;
+            const selectedTime = document.querySelector('#booking .time-slot.selected').textContent;
+            const selectedPeople = document.getElementById('booking-people').value;
+
+            // Get selected premium services
+            const premiumServices = [];
+            if (document.getElementById('welcome-drink').checked) {
+                premiumServices.push('웰컴 드링크 서비스');
+            }
+            if (document.getElementById('vip-room').checked) {
+                premiumServices.push('VIP 룸 업그레이드');
+            }
+            if (document.getElementById('valet').checked) {
+                premiumServices.push('발렛 파킹 서비스');
+            }
+
+            // Create new reservation
+            const newReservation = {
+                id: 'R' + Date.now(),
+                restaurantId: restaurantId,
+                date: '2024년 12월 ' + selectedDate + '일',
+                day: selectedDate,
+                month: '12월',
+                time: selectedTime,
+                people: selectedPeople,
+                purpose: '특별한 날',
+                status: 'upcoming',
+                specialRequest: '예약 확정되었습니다.',
+                premiumServices: premiumServices
+            };
+
+            // Add to reservations
+            reservations.unshift(newReservation);
+
+            alert(`${restaurant.name} 예약이 확정되었습니다!\n예약번호: ${newReservation.id}`);
+            showScreen('reservations');
+            updateReservationsList();
+        }
+
+        function updateReservationsList() {
+            const reservationsScreen = document.getElementById('reservations');
+            if (!reservationsScreen) return;
+
+            const reservationsContent = reservationsScreen.querySelector('.content');
+
+            let upcomingHTML = '';
+            let completedHTML = '';
+
+            reservations.forEach(reservation => {
+                const restaurant = restaurants[reservation.restaurantId];
+                const reservationHTML = `
+                    <div class="card" ${reservation.status === 'upcoming' ? 'style="background-color: #f9f9f9;"' : ''} onclick="showScreen('reservation-detail', '${reservation.id}')">
+                        <div style="width: 50px; height: 50px; background-color: ${reservation.status === 'upcoming' ? '#007AFF' : '#f0f0f0'}; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px; ${reservation.status === 'upcoming' ? 'color: white;' : ''}">
+                            <div style="text-align: center;">
+                                <div style="font-weight: bold;">${reservation.day}</div>
+                                <div style="font-size: 10px;">${reservation.month}</div>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title">${restaurant.name}</div>
+                            <div class="card-detail">${reservation.time} • ${reservation.people} • ${reservation.purpose}</div>
+                            ${reservation.rating ? `<div style="color: #FFD700; font-size: 14px;">${'⭐'.repeat(reservation.rating)}</div>` : ''}
+                        </div>
+                        <span style="font-size: 12px; color: ${reservation.status === 'upcoming' ? '#007AFF' : '#666'};">${reservation.status === 'upcoming' ? '예정' : '완료'}</span>
+                    </div>
+                `;
+
+                if (reservation.status === 'upcoming') {
+                    upcomingHTML += reservationHTML;
+                } else {
+                    completedHTML += reservationHTML;
+                }
+            });
+
+            // If no reservations at all
+            if (reservations.length === 0) {
+                reservationsContent.innerHTML = `
+                    <h3 style="margin-bottom: 20px;">전체 예약 내역</h3>
+                    <div style="text-align: center; padding: 60px 20px; color: #666;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📋</div>
+                        <p style="font-size: 16px; margin-bottom: 10px;">예약 내역이 없습니다</p>
+                        <p style="font-size: 14px;">새로운 예약을 만들어보세요!</p>
+                    </div>
+                `;
+            } else {
+                reservationsContent.innerHTML = `
+                    <h3 style="margin-bottom: 20px;">전체 예약 내역</h3>
+                    ${upcomingHTML ? `
+                        <h4 style="font-size: 14px; color: #666; margin-bottom: 15px;">예정된 예약</h4>
+                        ${upcomingHTML}
+                    ` : ''}
+                    ${completedHTML ? `
+                        <h4 style="font-size: 14px; color: #666; margin: 20px 0 15px;">완료된 예약</h4>
+                        ${completedHTML}
+                    ` : ''}
+                `;
+            }
+        }
+
+        function cancelReservation(reservationId) {
+            // Create custom confirmation dialog
+            const confirmDialog = document.createElement('div');
+            confirmDialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+
+            const dialogContent = document.createElement('div');
+            dialogContent.style.cssText = `
+                background-color: white;
+                padding: 30px;
+                border-radius: 20px;
+                max-width: 300px;
+                text-align: center;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            `;
+
+            dialogContent.innerHTML = `
+                <h3 style="margin-bottom: 15px; font-size: 20px;">예약 취소</h3>
+                <p style="margin-bottom: 25px; color: #666; line-height: 1.5;">
+                    정말로 예약을 취소하시겠습니까?<br>
+                    취소된 예약은 복구할 수 없습니다.
+                </p>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="confirmCancellation('${reservationId}')" style="
+                        flex: 1;
+                        padding: 12px;
+                        background-color: #FF3B30;
+                        color: white;
+                        border: none;
+                        border-radius: 10px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                    ">취소하기</button>
+                    <button onclick="closeCancelDialog()" style="
+                        flex: 1;
+                        padding: 12px;
+                        background-color: #f0f0f0;
+                        color: #333;
+                        border: none;
+                        border-radius: 10px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                    ">돌아가기</button>
+                </div>
+            `;
+
+            confirmDialog.appendChild(dialogContent);
+            document.body.appendChild(confirmDialog);
+        }
+
+        function confirmCancellation(reservationId) {
+            // Close dialog
+            closeCancelDialog();
+
+            // Find and remove the reservation
+            const index = reservations.findIndex(r => r.id === reservationId);
+            if (index !== -1) {
+                const cancelledReservation = reservations[index];
+                const restaurant = restaurants[cancelledReservation.restaurantId];
+
+                // Remove from reservations array
+                reservations.splice(index, 1);
+
+                // Show cancellation message
+                showNotification(`${restaurant.name} 예약이 취소되었습니다.`);
+
+                // Go back to reservations list
+                showScreen('reservations');
+                updateReservationsList();
+            }
+        }
+
+        function closeCancelDialog() {
+            const dialog = document.querySelector('div[style*="position: fixed"]');
+            if (dialog) {
+                dialog.remove();
+            }
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 20px 30px;
+                border-radius: 10px;
+                font-size: 16px;
+                z-index: 10000;
+                animation: fadeInOut 2s ease;
+            `;
+            notification.textContent = message;
+
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0% { opacity: 0; }
+                    20% { opacity: 1; }
+                    80% { opacity: 1; }
+                    100% { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+                style.remove();
+            }, 2000);
+        }
+
+        function toggleFavorite(restaurantId) {
+            const restaurant = restaurants[restaurantId];
+            if (!restaurant) return;
+
+            // Toggle favorite status
+            restaurant.isFavorite = !restaurant.isFavorite;
+
+            // Update star icon
+            const starIcon = document.querySelector(`#restaurant-detail span[onclick*="toggleFavorite"]`);
+            if (starIcon) {
+                starIcon.textContent = restaurant.isFavorite ? '★' : '☆';
+                starIcon.style.color = restaurant.isFavorite ? '#FFD700' : '#ccc';
+            }
+
+            // Show notification
+            if (restaurant.isFavorite) {
+                showNotification(`${restaurant.name}이(가) 즐겨찾기에 추가되었습니다.`);
+            } else {
+                showNotification(`${restaurant.name}이(가) 즐겨찾기에서 제거되었습니다.`);
+            }
+
+            // Update favorites list
+            updateFavoritesList();
+        }
+
+        function updateFavoritesList() {
+            const favoritesScreen = document.getElementById('favorites');
+            if (!favoritesScreen) return;
+
+            const favoritesContent = favoritesScreen.querySelector('.content');
+
+            const favoriteRestaurants = Object.entries(restaurants).filter(([id, restaurant]) => restaurant.isFavorite);
+
+            if (favoriteRestaurants.length === 0) {
+                favoritesContent.innerHTML = `
+                    <h3 style="margin-bottom: 20px;">내가 찜한 맛집</h3>
+                    <div style="text-align: center; padding: 60px 20px; color: #666;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⭐</div>
+                        <p style="font-size: 16px; margin-bottom: 10px;">아직 즐겨찾기한 맛집이 없어요</p>
+                        <p style="font-size: 14px;">마음에 드는 맛집을 즐겨찾기에 추가해보세요!</p>
+                    </div>
+                `;
+            } else {
+                let favoritesHTML = '<h3 style="margin-bottom: 20px;">내가 찜한 맛집</h3>';
+
+                favoriteRestaurants.forEach(([id, restaurant]) => {
+                    favoritesHTML += `
+                        <div class="card" onclick="showScreen('restaurant-detail', '${id}')">
+                            <div class="card-image">${restaurant.icon}</div>
+                            <div class="card-info">
+                                <div class="card-title">${restaurant.name}</div>
+                                <div class="card-detail">${restaurant.area} • ⭐ ${restaurant.rating}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                favoritesContent.innerHTML = favoritesHTML;
+            }
+        }
+
+        function modifyReservation(reservationId) {
+            const reservation = reservations.find(r => r.id === reservationId);
+            if (!reservation) return;
+
+            // Show booking screen with existing reservation data
+            currentReservation = reservation;
+            showModifyBooking(reservation);
+        }
+
+        function showModifyBooking(reservation) {
+            const restaurant = restaurants[reservation.restaurantId];
+
+            // Create modify booking screen
+            const modifyScreen = document.createElement('div');
+            modifyScreen.className = 'screen active';
+            modifyScreen.id = 'modify-booking';
+            modifyScreen.innerHTML = `
+                <div class="nav">
+                    <div class="nav-back" onclick="goBack()">←</div>
+                    <div class="nav-title">예약 변경</div>
+                </div>
+                <div class="content">
+                    <div class="card" style="background-color: #f5f5f5; border: none;">
+                        <div>
+                            <h3 style="margin-bottom: 5px;">${restaurant.name} 예약 변경</h3>
+                            <p style="color: #666; font-size: 14px;">예약번호: ${reservation.id}</p>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom: 10px;">날짜 선택</h4>
+                    <div class="calendar" id="modify-calendar">
+                        <div class="calendar-day">월</div>
+                        <div class="calendar-day">화</div>
+                        <div class="calendar-day">수</div>
+                        <div class="calendar-day">목</div>
+                        <div class="calendar-day">금</div>
+                        <div class="calendar-day">토</div>
+                        <div class="calendar-day">일</div>
+                        <div class="calendar-day">15</div>
+                        <div class="calendar-day">16</div>
+                        <div class="calendar-day ${reservation.day === '17' ? 'selected' : ''}">17</div>
+                        <div class="calendar-day ${reservation.day === '18' ? 'selected' : ''}">18</div>
+                        <div class="calendar-day ${reservation.day === '19' ? 'selected' : ''}">19</div>
+                        <div class="calendar-day ${reservation.day === '20' ? 'selected' : ''}">20</div>
+                        <div class="calendar-day ${reservation.day === '21' ? 'selected' : ''}">21</div>
+                    </div>
+
+                    <h4 style="margin-bottom: 10px;">시간 선택</h4>
+                    <div class="time-grid" id="modify-time-grid">
+                        <div class="time-slot ${reservation.time === '11:30' ? 'selected' : ''}">11:30</div>
+                        <div class="time-slot ${reservation.time === '12:00' ? 'selected' : ''}">12:00</div>
+                        <div class="time-slot ${reservation.time === '12:30' ? 'selected' : ''}">12:30</div>
+                        <div class="time-slot disabled">13:00</div>
+                        <div class="time-slot ${reservation.time === '18:00' ? 'selected' : ''}">18:00</div>
+                        <div class="time-slot ${reservation.time === '18:30' ? 'selected' : ''}">18:30</div>
+                        <div class="time-slot ${reservation.time === '19:00' ? 'selected' : ''}">19:00</div>
+                        <div class="time-slot disabled">19:30</div>
+                    </div>
+
+                    <h4 style="margin-bottom: 10px;">인원</h4>
+                    <select id="modify-people" style="width: 100%; height: 45px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 0 15px; font-size: 16px; margin-bottom: 20px;">
+                        <option ${reservation.people === '2명' ? 'selected' : ''}>2명</option>
+                        <option ${reservation.people === '3명' ? 'selected' : ''}>3명</option>
+                        <option ${reservation.people === '4명' ? 'selected' : ''}>4명</option>
+                        <option ${reservation.people === '5명' ? 'selected' : ''}>5명</option>
+                        <option ${reservation.people === '6명' ? 'selected' : ''}>6명</option>
+                    </select>
+
+                    <h4 style="margin-bottom: 10px;">특별 요청사항</h4>
+                    <textarea id="modify-request" style="width: 100%; height: 80px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px; font-size: 14px; margin-bottom: 20px; resize: none;">${reservation.specialRequest}</textarea>
+
+                    <div style="background-color: #FFF9E6; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px;">
+                            <span style="background-color: #FFD700; padding: 4px 10px; border-radius: 20px; font-size: 12px;">Premium</span>
+                            추가 옵션
+                        </h4>
+                        <div class="premium-option">
+                            <input type="checkbox" id="modify-welcome-drink" ${reservation.premiumServices.includes('웰컴 드링크 서비스') ? 'checked' : ''}>
+                            <label for="modify-welcome-drink">
+                                <div class="premium-option-title">웰컴 드링크 서비스</div>
+                                <div class="premium-option-desc">샴페인 또는 논알콜 음료 제공</div>
+                            </label>
+                        </div>
+                        <div class="premium-option">
+                            <input type="checkbox" id="modify-vip-room" ${reservation.premiumServices.includes('VIP 룸 업그레이드') ? 'checked' : ''}>
+                            <label for="modify-vip-room">
+                                <div class="premium-option-title">VIP 룸 업그레이드</div>
+                                <div class="premium-option-desc">프라이빗 공간, 전담 서버 배정</div>
+                            </label>
+                        </div>
+                        <div class="premium-option">
+                            <input type="checkbox" id="modify-valet" ${reservation.premiumServices.includes('발렛 파킹 서비스') ? 'checked' : ''}>
+                            <label for="modify-valet">
+                                <div class="premium-option-title">발렛 파킹 서비스</div>
+                                <div class="premium-option-desc">무료 발렛 파킹 제공</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="button" onclick="confirmModification('${reservation.id}')">예약 변경 확인</button>
+                </div>
+            `;
+
+            // Hide all screens and show modify screen
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.querySelector('.phone-screen').appendChild(modifyScreen);
+
+            // Add event listeners for calendar and time
+            setTimeout(() => {
+                document.querySelectorAll('#modify-calendar .calendar-day').forEach(day => {
+                    if (!isNaN(day.textContent)) {
+                        day.addEventListener('click', function () {
+                            document.querySelectorAll('#modify-calendar .calendar-day').forEach(d => d.classList.remove('selected'));
+                            this.classList.add('selected');
+                        });
+                    }
+                });
+
+                document.querySelectorAll('#modify-time-grid .time-slot').forEach(slot => {
+                    if (!slot.classList.contains('disabled')) {
+                        slot.addEventListener('click', function () {
+                            document.querySelectorAll('#modify-time-grid .time-slot').forEach(s => s.classList.remove('selected'));
+                            this.classList.add('selected');
+                        });
+                    }
+                });
+            }, 100);
+        }
+
+        function confirmModification(reservationId) {
+            const reservation = reservations.find(r => r.id === reservationId);
+            if (!reservation) return;
+
+            // Get modified values
+            const selectedDate = document.querySelector('#modify-calendar .calendar-day.selected').textContent;
+            const selectedTime = document.querySelector('#modify-time-grid .time-slot.selected').textContent;
+            const selectedPeople = document.getElementById('modify-people').value;
+            const specialRequest = document.getElementById('modify-request').value;
+
+            // Get selected premium services
+            const premiumServices = [];
+            if (document.getElementById('modify-welcome-drink').checked) {
+                premiumServices.push('웰컴 드링크 서비스');
+            }
+            if (document.getElementById('modify-vip-room').checked) {
+                premiumServices.push('VIP 룸 업그레이드');
+            }
+            if (document.getElementById('modify-valet').checked) {
+                premiumServices.push('발렛 파킹 서비스');
+            }
+
+            // Update reservation
+            reservation.date = '2024년 12월 ' + selectedDate + '일';
+            reservation.day = selectedDate;
+            reservation.time = selectedTime;
+            reservation.people = selectedPeople;
+            reservation.specialRequest = specialRequest;
+            reservation.premiumServices = premiumServices;
+
+            // Remove modify screen
+            const modifyScreen = document.getElementById('modify-booking');
+            if (modifyScreen) {
+                modifyScreen.remove();
+            }
+
+            alert('예약이 변경되었습니다!');
+            showScreen('reservation-detail', reservation.id);
+            updateReservationsList();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            updateReservationsList();
+            updateFavoritesList();
+        });
+    </script>
+</body>
+
+</html>

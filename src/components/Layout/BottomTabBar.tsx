@@ -9,9 +9,9 @@ interface BottomTabBarProps {
 
 const tabs: TabItem[] = [
   { id: 'home', label: '홈' },
-  { id: 'ai', label: 'AI 추천' },
-  { id: 'favorites', label: '즐겨찾기' },
-  { id: 'mypage', label: '마이페이지' },
+  { id: 'ai', label: 'AI추천' },
+  { id: 'favorites', label: '예약내역' },
+  { id: 'mypage', label: 'MY' },
 ];
 
 export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabChange }) => {

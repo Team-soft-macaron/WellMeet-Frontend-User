@@ -6,6 +6,7 @@ export interface Restaurant {
   price: string;
   distance: string;
   image: string;
+  icon?: string;
 }
 
 export type TabType = 'home' | 'ai' | 'favorites' | 'mypage';
