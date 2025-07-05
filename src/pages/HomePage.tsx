@@ -11,7 +11,7 @@ const mockRestaurants = [
     address: '강남구',
     distance: '500m',
     rating: 4.9,
-    icon: '🍽️'
+    thumbnail: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'
   },
   {
     id: '2',
@@ -19,7 +19,7 @@ const mockRestaurants = [
     address: '강남구',
     distance: '800m',
     rating: 4.7,
-    icon: '🥩'
+    thumbnail: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800'
   },
   {
     id: '3',
@@ -27,7 +27,7 @@ const mockRestaurants = [
     address: '강남구',
     distance: '1.2km',
     rating: 4.6,
-    icon: '🍷'
+    thumbnail: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800'
   },
   {
     id: '4',
@@ -35,7 +35,7 @@ const mockRestaurants = [
     address: '강남구',
     distance: '600m',
     rating: 4.8,
-    icon: '🍣'
+    thumbnail: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800'
   }
 ];
 

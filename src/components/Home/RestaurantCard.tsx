@@ -7,7 +7,7 @@ interface RestaurantCardProps {
   address: string;
   distance: string;
   rating: number;
-  icon: string;
+  thumbnail: string;
   onClick?: () => void;
 }
 
@@ -16,12 +16,14 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({
   address,
   distance,
   rating,
-  icon,
+  thumbnail,
   onClick
 }) => {
   return (
     <div className="hover-lift" style={styles.card} onClick={onClick}>
-      <div style={styles.cardImage}>{icon}</div>
+      <div style={styles.cardImage}>
+        <img src={thumbnail} alt={name} style={styles.image} />
+      </div>
       <div style={styles.cardInfo}>
         <div style={styles.cardTitle}>{name}</div>
         <div style={styles.cardDetail}>{address} • {distance} • ⭐ {rating}</div>
@@ -67,5 +69,11 @@ const styles = {
     fontSize: theme.typography.fontSize.small,
     color: theme.colors.textSecondary,
     lineHeight: 1.4,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover' as const,
+    borderRadius: theme.borderRadius.small,
   },
 };
