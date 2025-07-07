@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { theme } from '../styles/theme';
 
 interface RestaurantDetailPageProps {
@@ -7,67 +7,172 @@ interface RestaurantDetailPageProps {
   onBooking: () => void;
 }
 
-const mockRestaurantData = {
-  id: '1',
-  name: '정식당',
-  address: '강남구 테헤란로 142',
-  rating: 4.9,
-  reviewCount: 234,
-  icon: '🍽️',
-  menus: [
-    { name: '런치 코스 A', price: '35,000원' },
-    { name: '런치 코스 B', price: '50,000원' },
-    { name: '디너 코스', price: '80,000원' }
-  ],
-  reviews: [
-    {
-      type: '비즈니스 미팅',
-      icon: '💼',
-      comment: '조용한 룸, 완벽한 서비스로 계약 성공!'
-    },
-    {
-      type: '데이트',
-      icon: '❤️',
-      comment: '분위기 좋고 음식도 맛있어요. 프로포즈 성공!'
-    }
-  ]
+interface Menu {
+  name: string;
+  price: number;
+}
+
+interface Review {
+  situation: string;
+  logo: string;
+  content: string;
+}
+
+interface RestaurantData {
+  id: string;
+  name: string;
+  address: string;
+  rating: number;
+  reviewCount: number;
+  thumbnail: string;
+  latitude: number;
+  longitude: number;
+  menus: Menu[];
+  reviews: Review[];
+  favorite: boolean;
+}
+
+const formatPrice = (price: number): string => {
+  return price.toLocaleString('ko-KR') + '원';
 };
 
 export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
+  restaurantId,
   onBack,
   onBooking
 }) => {
+  const [restaurantData, setRestaurantData] = useState<RestaurantData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!restaurantId) {
+      setError('Restaurant ID is required');
+      setLoading(false);
+      return;
+    }
+
+    const fetchRestaurantData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:8080/api/restaurant/${restaurantId}?memberId=1`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch restaurant data');
+        }
+        
+        const data = await response.json();
+        setRestaurantData(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurantData();
+  }, [restaurantId]);
+
+  const toggleFavorite = async () => {
+    if (!restaurantData || !restaurantId) return;
+
+    try {
+      const method = restaurantData.favorite ? 'DELETE' : 'POST';
+      const response = await fetch(
+        `http://localhost:8080/api/favorite/restaurant/${restaurantId}?memberId=1`,
+        { method }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update favorite status');
+      }
+
+      // Update local state
+      setRestaurantData({
+        ...restaurantData,
+        favorite: !restaurantData.favorite
+      });
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
+      alert('즐겨찾기 변경에 실패했습니다.');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.loadingContainer}>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.errorContainer}>
+          <p>Error: {error}</p>
+          <button onClick={onBack}>Go Back</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!restaurantData) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.errorContainer}>
+          <p>No restaurant data found</p>
+          <button onClick={onBack}>Go Back</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
         <button style={styles.backButton} onClick={onBack}>←</button>
-        <h1 style={styles.headerTitle}>{mockRestaurantData.name}</h1>
+        <h1 style={styles.headerTitle}>{restaurantData.name}</h1>
         <div style={styles.headerSpacer} />
       </div>
 
       <div style={styles.content}>
         <div style={styles.imageContainer}>
-          <div style={styles.imagePlaceholder}>
-            {mockRestaurantData.icon}
-          </div>
+          <img 
+            src={restaurantData.thumbnail} 
+            alt={restaurantData.name}
+            style={styles.image}
+          />
         </div>
 
         <div style={styles.infoSection}>
           <div style={styles.titleSection}>
             <div>
-              <h2 style={styles.restaurantName}>{mockRestaurantData.name}</h2>
-              <p style={styles.address}>{mockRestaurantData.address}</p>
+              <h2 style={styles.restaurantName}>{restaurantData.name}</h2>
+              <p style={styles.address}>{restaurantData.address}</p>
             </div>
-            <span style={styles.favoriteIcon}>☆</span>
+            <button
+              onClick={toggleFavorite}
+              style={{
+                ...styles.favoriteIcon,
+                color: restaurantData.favorite ? '#FFD700' : '#ccc',
+                background: 'none',
+                border: 'none',
+              }}
+            >
+              {restaurantData.favorite ? '★' : '☆'}
+            </button>
           </div>
 
           <div style={styles.statsGrid}>
             <div style={styles.statItem}>
-              <div style={styles.statValue}>{mockRestaurantData.rating}</div>
+              <div style={styles.statValue}>{restaurantData.rating}</div>
               <div style={styles.statLabel}>평점</div>
             </div>
             <div style={styles.statItem}>
-              <div style={styles.statValue}>{mockRestaurantData.reviewCount}</div>
+              <div style={styles.statValue}>{restaurantData.reviewCount}</div>
               <div style={styles.statLabel}>리뷰수</div>
             </div>
           </div>
@@ -75,10 +180,10 @@ export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>대표 메뉴</h3>
             <div style={styles.menuList}>
-              {mockRestaurantData.menus.map((menu, index) => (
+              {restaurantData.menus.map((menu, index) => (
                 <div key={index} style={styles.menuItem}>
                   <span>{menu.name}</span>
-                  <span style={styles.menuPrice}>{menu.price}</span>
+                  <span style={styles.menuPrice}>{formatPrice(menu.price)}</span>
                 </div>
               ))}
             </div>
@@ -89,13 +194,13 @@ export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
               <h3 style={styles.sectionTitle}>상황별 후기</h3>
               <button style={styles.moreButton}>더보기 ›</button>
             </div>
-            {mockRestaurantData.reviews.map((review, index) => (
+            {restaurantData.reviews.map((review, index) => (
               <div key={index} style={styles.reviewCard}>
-                <span style={styles.reviewIcon}>{review.icon}</span>
+                <span style={styles.reviewIcon}>{review.logo}</span>
                 <div>
-                  <strong>{review.type}</strong>
+                  <strong>{review.situation}</strong>
                   <br />
-                  <span style={styles.reviewComment}>"{review.comment}"</span>
+                  <span style={styles.reviewComment}>"{review.content}"</span>
                 </div>
               </div>
             ))}
@@ -160,6 +265,11 @@ const styles = {
   imagePlaceholder: {
     fontSize: 48,
   },
+  image: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover' as const,
+  },
   infoSection: {
     padding: theme.spacing.xl,
   },
@@ -180,7 +290,6 @@ const styles = {
   },
   favoriteIcon: {
     fontSize: 32,
-    color: '#ccc',
     cursor: 'pointer',
   },
   statsGrid: {
@@ -268,5 +377,23 @@ const styles = {
     fontSize: theme.typography.fontSize.medium,
     fontWeight: theme.typography.fontWeight.semibold,
     cursor: 'pointer',
+  },
+  loadingContainer: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: theme.typography.fontSize.large,
+    color: theme.colors.textSecondary,
+  },
+  errorContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing.xl,
+    textAlign: 'center' as const,
+    color: theme.colors.textSecondary,
   },
 };

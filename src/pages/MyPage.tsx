@@ -1,63 +1,48 @@
 import React from 'react';
 import { theme } from '../styles/theme';
 
-export const MyPage: React.FC = () => {
+interface MyPageProps {
+  onFavoritesClick?: () => void;
+  onReservationsClick?: () => void;
+}
+
+export const MyPage: React.FC<MyPageProps> = ({ onFavoritesClick, onReservationsClick }) => {
   const menuItems = [
-    { icon: '👤', label: '프로필 설정', badge: null },
-    { icon: '🏆', label: 'Premium 멤버십', badge: 'Premium' },
-    { icon: '💳', label: '결제 수단 관리', badge: null },
-    { icon: '🔔', label: '알림 설정', badge: null },
-    { icon: '📞', label: '고객센터', badge: null },
-    { icon: '📄', label: '이용약관', badge: null },
-    { icon: '🚪', label: '로그아웃', badge: null },
+    { icon: '👤', label: '내 정보', detail: '프로필 및 계정 관리', badge: null, onClick: undefined },
+    { icon: '📋', label: '예약 내역', detail: '지난 예약 및 리뷰 관리', badge: null, onClick: onReservationsClick },
+    { icon: '🎁', label: '이벤트/혜택', detail: '프리미엄 회원 전용 혜택', badge: null, onClick: undefined },
+    { icon: '⭐', label: '즐겨찾기', detail: '자주 가는 맛집 목록', badge: null, onClick: onFavoritesClick },
+    { icon: '⚙️', label: '설정', detail: '알림, 언어, 로그아웃', badge: null, onClick: undefined },
   ];
 
   return (
     <div style={styles.container}>
       <div style={styles.profileSection}>
-        <div style={styles.profileImage}>👤</div>
+        <div style={styles.profileImageContainer}>
+          <div style={styles.profileImage}>👤</div>
+        </div>
         <div style={styles.profileInfo}>
-          <h2 style={styles.profileName}>김웰밋</h2>
-          <p style={styles.profileEmail}>wellmeet@example.com</p>
-          <div style={styles.premiumBadge}>Premium Member</div>
+          <div style={styles.profileName}>유성민</div>
+          <div style={styles.profileStatus}>Premium Member</div>
         </div>
       </div>
 
-      <div style={styles.statsSection}>
-        <div style={styles.statItem}>
-          <div style={styles.statValue}>42</div>
-          <div style={styles.statLabel}>예약 횟수</div>
-        </div>
-        <div style={styles.statItem}>
-          <div style={styles.statValue}>15</div>
-          <div style={styles.statLabel}>작성 리뷰</div>
-        </div>
-        <div style={styles.statItem}>
-          <div style={styles.statValue}>8</div>
-          <div style={styles.statLabel}>즐겨찾기</div>
-        </div>
-      </div>
 
       <div style={styles.menuList}>
         {menuItems.map((item, index) => (
-          <button key={index} style={styles.menuItem}>
-            <div style={styles.menuLeft}>
+          <button key={index} style={styles.menuItem} onClick={item.onClick}>
+            <div style={styles.menuIconContainer}>
               <span style={styles.menuIcon}>{item.icon}</span>
-              <span style={styles.menuLabel}>{item.label}</span>
             </div>
-            <div style={styles.menuRight}>
-              {item.badge && (
-                <span style={styles.menuBadge}>{item.badge}</span>
-              )}
-              <span style={styles.menuArrow}>›</span>
+            <div style={styles.menuContent}>
+              <div style={styles.menuLabel}>{item.label}</div>
+              <div style={styles.menuDetail}>{item.detail}</div>
             </div>
+            <span style={styles.menuArrow}>›</span>
           </button>
         ))}
       </div>
 
-      <div style={styles.versionInfo}>
-        버전 1.0.0
-      </div>
     </div>
   );
 };
@@ -69,120 +54,87 @@ const styles = {
     overflowX: 'hidden' as const,
     boxSizing: 'border-box' as const,
     width: '100%',
-    backgroundColor: theme.colors.backgroundSecondary,
+    backgroundColor: theme.colors.background,
     height: '100%',
   },
   profileSection: {
-    backgroundColor: 'white',
-    padding: theme.spacing.xl,
+    backgroundColor: theme.colors.backgroundSecondary,
+    padding: `${theme.spacing.xl}px ${theme.spacing.xl}px ${theme.spacing.xxl}px`,
     display: 'flex',
     alignItems: 'center',
     gap: theme.spacing.lg,
-    borderBottom: `1px solid ${theme.colors.border}`,
+    borderRadius: theme.borderRadius.large,
+    margin: theme.spacing.xl,
+    marginBottom: theme.spacing.xxl,
   },
-  profileImage: {
-    width: 70,
-    height: 70,
+  profileImageContainer: {
+    width: 60,
+    height: 60,
     borderRadius: '50%',
-    backgroundColor: theme.colors.inputBackground,
+    backgroundColor: theme.colors.primary,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 36,
+  },
+  profileImage: {
+    fontSize: 32,
+    color: 'white',
   },
   profileInfo: {
     flex: 1,
   },
   profileName: {
-    fontSize: theme.typography.fontSize.xlarge,
-    fontWeight: theme.typography.fontWeight.bold,
-    marginBottom: theme.spacing.xs,
-  },
-  profileEmail: {
-    fontSize: theme.typography.fontSize.small,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.sm,
-  },
-  premiumBadge: {
-    display: 'inline-block',
-    backgroundColor: '#FFD700',
-    color: '#333',
-    padding: `4px 12px`,
-    borderRadius: 20,
-    fontSize: theme.typography.fontSize.small,
+    fontSize: theme.typography.fontSize.large,
     fontWeight: theme.typography.fontWeight.semibold,
-  },
-  statsSection: {
-    backgroundColor: 'white',
-    padding: theme.spacing.xl,
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-  },
-  statItem: {
-    textAlign: 'center' as const,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: theme.typography.fontWeight.bold,
     marginBottom: theme.spacing.xs,
   },
-  statLabel: {
-    fontSize: theme.typography.fontSize.small,
+  profileStatus: {
+    fontSize: theme.typography.fontSize.medium,
     color: theme.colors.textSecondary,
   },
   menuList: {
-    backgroundColor: 'white',
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.sm,
+    padding: `0 ${theme.spacing.xl}px`,
   },
   menuItem: {
     width: '100%',
-    padding: `${theme.spacing.lg}px ${theme.spacing.xl}px`,
-    backgroundColor: 'white',
-    border: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease',
-  },
-  menuLeft: {
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background,
+    border: `1px solid ${theme.colors.border}`,
+    borderRadius: theme.borderRadius.large,
     display: 'flex',
     alignItems: 'center',
     gap: theme.spacing.md,
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease',
+    marginBottom: theme.spacing.md,
+  },
+  menuIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: '50%',
+    backgroundColor: theme.colors.backgroundSecondary,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   menuIcon: {
     fontSize: 20,
-    width: 24,
-    textAlign: 'center' as const,
+  },
+  menuContent: {
+    flex: 1,
   },
   menuLabel: {
     fontSize: theme.typography.fontSize.medium,
+    fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
   },
-  menuRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  menuBadge: {
-    backgroundColor: '#FFD700',
-    color: '#333',
-    padding: `2px 8px`,
-    borderRadius: 12,
-    fontSize: theme.typography.fontSize.xsmall,
-    fontWeight: theme.typography.fontWeight.semibold,
+  menuDetail: {
+    fontSize: theme.typography.fontSize.small,
+    color: theme.colors.textSecondary,
   },
   menuArrow: {
     fontSize: 20,
-    color: theme.colors.textSecondary,
-  },
-  versionInfo: {
-    textAlign: 'center' as const,
-    padding: theme.spacing.xl,
-    fontSize: theme.typography.fontSize.small,
     color: theme.colors.textSecondary,
   },
 };

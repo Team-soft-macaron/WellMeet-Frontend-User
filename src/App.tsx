@@ -10,9 +10,10 @@ import { MyPage } from './pages/MyPage';
 import { SearchPage } from './pages/SearchPage';
 import { RestaurantDetailPage } from './pages/RestaurantDetailPage';
 import { BookingPage } from './pages/BookingPage';
+import { FavoritesPage } from './pages/FavoritesPage';
 import './App.css';
 
-type PageType = TabType | 'search' | 'restaurant-detail' | 'booking';
+type PageType = TabType | 'search' | 'restaurant-detail' | 'booking' | 'favorites-page';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -28,6 +29,7 @@ function App() {
       search: '검색',
       'restaurant-detail': '레스토랑 상세',
       booking: '예약하기',
+      'favorites-page': '즐겨찾기',
     };
     return titles[currentPage];
   };
@@ -62,7 +64,12 @@ function App() {
       case 'favorites':
         return <ReservationsPage />;
       case 'mypage':
-        return <MyPage />;
+        return (
+          <MyPage 
+            onFavoritesClick={() => navigateTo('favorites-page')}
+            onReservationsClick={() => navigateTo('favorites')}
+          />
+        );
       case 'search':
         return (
           <SearchPage 
@@ -86,6 +93,13 @@ function App() {
               alert('예약이 완료되었습니다!');
               navigateTo('favorites');
             }}
+          />
+        );
+      case 'favorites-page':
+        return (
+          <FavoritesPage 
+            onBack={goBack}
+            onRestaurantClick={(id) => navigateTo('restaurant-detail', id)}
           />
         );
       default:
