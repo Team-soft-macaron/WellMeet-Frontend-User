@@ -9,11 +9,13 @@ export const theme = {
     text: '#000000',
     textSecondary: '#666666',
     activeBackground: '#f0f8ff',
+    inputBackground: '#f5f5f5',
   },
   
   typography: {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: {
+      xsmall: '11px',
       small: '12px',
       medium: '14px',
       regular: '16px',
@@ -24,6 +26,8 @@ export const theme = {
       regular: '400',
       medium: '500',
       semibold: '600',
+      semiBold: '600',
+      bold: '700',
     },
   },
   
