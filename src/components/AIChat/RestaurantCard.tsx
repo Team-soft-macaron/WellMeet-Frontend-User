@@ -6,14 +6,21 @@ interface RestaurantCardProps {
     location: string;
     rating: number;
     vibe?: string;
-    icon?: string;
+    thumbnail?: string;
+    onClick?: () => void;
 }
 
 export const RestaurantCard: React.FC<RestaurantCardProps> = ({
-    name, category, location, rating, vibe, icon
+    name, category, location, rating, vibe, thumbnail, onClick
 }) => (
-    <div style={styles.card}>
-        <div style={styles.icon}>{icon || '🍽️'}</div>
+    <div style={styles.card} onClick={onClick}>
+        <div style={styles.icon}>
+            {thumbnail ? (
+                <img src={thumbnail} alt={name} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
+            ) : (
+                '🍽️'
+            )}
+        </div>
         <div style={styles.info}>
             <div style={styles.name}>{name}</div>
             <div style={styles.details}>
@@ -34,12 +41,17 @@ const styles: { [key: string]: React.CSSProperties } = {
         alignItems: 'center',
         background: '#fff',
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        cursor: 'pointer',
     },
     icon: {
         fontSize: 32,
         marginRight: 16,
         width: 40,
         textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 40,
     },
     info: {
         flex: 1,

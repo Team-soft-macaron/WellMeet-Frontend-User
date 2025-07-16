@@ -3,7 +3,8 @@ import { theme } from '../styles/theme';
 import { ChatMessage } from '../components/AIChat/ChatMessage';
 import { ChatInput } from '../components/AIChat/ChatInput';
 import { QuickReply } from '../components/AIChat/QuickReply';
-import { RestaurantCard } from '../components/AIChat/RestaurantCard'
+import { RestaurantCard } from '../components/AIChat/RestaurantCard';
+import { RestaurantDetailPage } from './RestaurantDetailPage';
 
 interface ChatMessageType {
   id: string;
@@ -21,6 +22,8 @@ type RestaurantCardData = {
   rating: number;
   vibe?: string;
   icon?: string;
+  thumbnail?: string;
+  id?: string;
 };
 
 const initialMessage: ChatMessageType = {
@@ -34,6 +37,7 @@ const initialMessage: ChatMessageType = {
 export const AIRecommendPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessageType[]>([initialMessage]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -58,7 +62,7 @@ export const AIRecommendPage: React.FC = () => {
     // AI 응답: /api/restaurants/recommend로 POST, body: { query: text }
     try {
       let aiResponse: ChatMessageType;
-      const res = await fetch('/api/restaurants/recommend', {
+      const res = await fetch('/recommendation/restaurants/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: text })
@@ -78,7 +82,8 @@ export const AIRecommendPage: React.FC = () => {
           location: r.address?.split(' ')[1] || '지역',
           rating: r.rating || 4.5,
           vibe: r.vibe || '',
-          icon: r.icon || '🍽️'
+          thumbnail: r.thumbnail || '',
+          id: r.id?.toString() || '',
         }));
       } else {
         aiResponse = {
@@ -110,6 +115,16 @@ export const AIRecommendPage: React.FC = () => {
   const lastMessage = messages[messages.length - 1];
   const showQuickReplies = lastMessage.type === 'ai' && lastMessage.quickReplies && !isLoading;
 
+  if (selectedRestaurantId) {
+    return (
+      <RestaurantDetailPage
+        restaurantId={selectedRestaurantId}
+        onBack={() => setSelectedRestaurantId(null)}
+        onBooking={() => { }}
+      />
+    );
+  }
+
   return (
     <div style={styles.container}>
       <div style={styles.messagesContainer}>
@@ -130,7 +145,8 @@ export const AIRecommendPage: React.FC = () => {
                     location={r.location}
                     rating={r.rating}
                     vibe={r.vibe}
-                    icon={r.icon}
+                    thumbnail={r.thumbnail}
+                    onClick={() => r.id && setSelectedRestaurantId(r.id)}
                   />
                 ))}
               </div>
