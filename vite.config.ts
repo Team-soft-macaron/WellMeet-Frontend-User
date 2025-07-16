@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080/api',
+        target: 'http://application-load-balancer-204859430.ap-northeast-2.elb.amazonaws.com/api',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
       },
