@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
 
-interface BookingPageProps {
-  restaurantName?: string;
-  onBack: () => void;
-  onConfirm: () => void;
-}
-
-export const BookingPage: React.FC<BookingPageProps> = ({
-  restaurantName = '정식당',
-  onBack,
-  onConfirm
-}) => {
+export const BookingPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [restaurantName] = useState('정식당');
   const [selectedDate, setSelectedDate] = useState(17);
   const [selectedTime, setSelectedTime] = useState('12:30');
   const [selectedPeople, setSelectedPeople] = useState('4명');
@@ -44,7 +37,7 @@ export const BookingPage: React.FC<BookingPageProps> = ({
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <button style={styles.backButton} onClick={onBack}>←</button>
+        <button style={styles.backButton} onClick={() => navigate(-1)}>←</button>
         <h1 style={styles.headerTitle}>예약하기</h1>
         <div style={styles.headerSpacer} />
       </div>
@@ -152,7 +145,10 @@ export const BookingPage: React.FC<BookingPageProps> = ({
           </label>
         </div>
 
-        <button style={styles.confirmButton} onClick={onConfirm}>
+        <button style={styles.confirmButton} onClick={() => {
+          alert('예약이 완료되었습니다!');
+          navigate('/reservations');
+        }}>
           예약 확정하기
         </button>
       </div>

@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
 
-interface FavoritesPageProps {
-  onBack: () => void;
-  onRestaurantClick: (restaurantId: string) => void;
-}
 
 interface FavoriteRestaurant {
   id: string;
@@ -14,7 +11,8 @@ interface FavoriteRestaurant {
   rating: number;
 }
 
-export const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onRestaurantClick }) => {
+export const FavoritesPage: React.FC = () => {
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState<FavoriteRestaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +43,7 @@ export const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onRestaura
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <button style={styles.backButton} onClick={onBack}>←</button>
+          <button style={styles.backButton} onClick={() => navigate(-1)}>←</button>
           <h1 style={styles.headerTitle}>즐겨찾기</h1>
           <div style={styles.headerSpacer} />
         </div>
@@ -60,13 +58,13 @@ export const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onRestaura
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <button style={styles.backButton} onClick={onBack}>←</button>
+          <button style={styles.backButton} onClick={() => navigate(-1)}>←</button>
           <h1 style={styles.headerTitle}>즐겨찾기</h1>
           <div style={styles.headerSpacer} />
         </div>
         <div style={styles.errorContainer}>
           <p>Error: {error}</p>
-          <button onClick={onBack}>Go Back</button>
+          <button onClick={() => navigate(-1)}>Go Back</button>
         </div>
       </div>
     );
@@ -75,7 +73,7 @@ export const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onRestaura
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <button style={styles.backButton} onClick={onBack}>←</button>
+        <button style={styles.backButton} onClick={() => navigate(-1)}>←</button>
         <h1 style={styles.headerTitle}>즐겨찾기</h1>
         <div style={styles.headerSpacer} />
       </div>
@@ -88,7 +86,7 @@ export const FavoritesPage: React.FC<FavoritesPageProps> = ({ onBack, onRestaura
             <button
               key={restaurant.id}
               style={styles.restaurantCard}
-              onClick={() => onRestaurantClick(restaurant.id)}
+              onClick={() => navigate(`/restaurant/${restaurant.id}`)}
             >
               <div style={styles.restaurantIcon}>
                 <img 

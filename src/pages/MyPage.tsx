@@ -1,17 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
 
-interface MyPageProps {
-  onFavoritesClick?: () => void;
-  onReservationsClick?: () => void;
+interface UserProfile {
+  name: string;
+  status: string;
+  avatar?: string;
 }
 
-export const MyPage: React.FC<MyPageProps> = ({ onFavoritesClick, onReservationsClick }) => {
-  const menuItems = [
+interface MenuItem {
+  icon: string;
+  label: string;
+  detail: string;
+  badge?: string | null;
+  onClick?: () => void;
+}
+
+export const MyPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState<UserProfile>({ name: '', status: '' });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/user/profile?memberId=1');
+        if (response.ok) {
+          const data = await response.json();
+          setUserProfile(data);
+        } else {
+          // Fallback to default values
+          setUserProfile({ name: '사용자', status: 'Member' });
+        }
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        setUserProfile({ name: '사용자', status: 'Member' });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const menuItems: MenuItem[] = [
     { icon: '👤', label: '내 정보', detail: '프로필 및 계정 관리', badge: null, onClick: undefined },
-    { icon: '📋', label: '예약 내역', detail: '지난 예약 및 리뷰 관리', badge: null, onClick: onReservationsClick },
+    { icon: '📋', label: '예약 내역', detail: '지난 예약 및 리뷰 관리', badge: null, onClick: () => navigate('/reservations') },
     { icon: '🎁', label: '이벤트/혜택', detail: '프리미엄 회원 전용 혜택', badge: null, onClick: undefined },
-    { icon: '⭐', label: '즐겨찾기', detail: '자주 가는 맛집 목록', badge: null, onClick: onFavoritesClick },
+    { icon: '⭐', label: '즐겨찾기', detail: '자주 가는 맛집 목록', badge: null, onClick: () => navigate('/favorites') },
     { icon: '⚙️', label: '설정', detail: '알림, 언어, 로그아웃', badge: null, onClick: undefined },
   ];
 
@@ -22,8 +58,8 @@ export const MyPage: React.FC<MyPageProps> = ({ onFavoritesClick, onReservations
           <div style={styles.profileImage}>👤</div>
         </div>
         <div style={styles.profileInfo}>
-          <div style={styles.profileName}>유성민</div>
-          <div style={styles.profileStatus}>Premium Member</div>
+          <div style={styles.profileName}>{loading ? '로딩 중...' : userProfile.name}</div>
+          <div style={styles.profileStatus}>{loading ? '' : userProfile.status}</div>
         </div>
       </div>
 

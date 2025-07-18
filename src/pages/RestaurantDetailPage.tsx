@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
 
-interface RestaurantDetailPageProps {
-  restaurantId?: string;
-  onBack: () => void;
-  onBooking: () => void;
-}
 
 interface Menu {
   name: string;
@@ -36,17 +32,15 @@ const formatPrice = (price: number): string => {
   return price.toLocaleString('ko-KR') + '원';
 };
 
-export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
-  restaurantId,
-  onBack,
-  onBooking
-}) => {
+export const RestaurantDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [restaurantData, setRestaurantData] = useState<RestaurantData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!restaurantId) {
+    if (!id) {
       setError('Restaurant ID is required');
       setLoading(false);
       return;
@@ -55,7 +49,7 @@ export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
     const fetchRestaurantData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/api/restaurant/${restaurantId}?memberId=1`);
+        const response = await fetch(`http://localhost:8080/api/restaurant/${id}?memberId=1`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch restaurant data');
@@ -71,15 +65,15 @@ export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
     };
 
     fetchRestaurantData();
-  }, [restaurantId]);
+  }, [id]);
 
   const toggleFavorite = async () => {
-    if (!restaurantData || !restaurantId) return;
+    if (!restaurantData || !id) return;
 
     try {
       const method = restaurantData.favorite ? 'DELETE' : 'POST';
       const response = await fetch(
-        `http://localhost:8080/api/favorite/restaurant/${restaurantId}?memberId=1`,
+        `http://localhost:8080/api/favorite/restaurant/${id}?memberId=1`,
         { method }
       );
 
@@ -113,7 +107,7 @@ export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
       <div style={styles.container}>
         <div style={styles.errorContainer}>
           <p>Error: {error}</p>
-          <button onClick={onBack}>Go Back</button>
+          <button onClick={() => navigate(-1)}>Go Back</button>
         </div>
       </div>
     );
@@ -124,7 +118,7 @@ export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
       <div style={styles.container}>
         <div style={styles.errorContainer}>
           <p>No restaurant data found</p>
-          <button onClick={onBack}>Go Back</button>
+          <button onClick={() => navigate(-1)}>Go Back</button>
         </div>
       </div>
     );
@@ -133,7 +127,7 @@ export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <button style={styles.backButton} onClick={onBack}>←</button>
+        <button style={styles.backButton} onClick={() => navigate(-1)}>←</button>
         <h1 style={styles.headerTitle}>{restaurantData.name}</h1>
         <div style={styles.headerSpacer} />
       </div>
@@ -207,7 +201,7 @@ export const RestaurantDetailPage: React.FC<RestaurantDetailPageProps> = ({
           </div>
         </div>
 
-        <button style={styles.bookingButton} onClick={onBooking}>
+        <button style={styles.bookingButton} onClick={() => navigate(`/booking/${id}`)}>
           예약하기
         </button>
       </div>

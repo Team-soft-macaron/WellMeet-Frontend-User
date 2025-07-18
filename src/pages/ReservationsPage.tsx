@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { theme } from '../styles/theme';
 
 interface ReservationItem {
@@ -11,37 +11,32 @@ interface ReservationItem {
   icon: string;
 }
 
-const mockReservations: ReservationItem[] = [
-  {
-    id: '1',
-    restaurantName: '정식당',
-    date: '2024.01.20',
-    time: '19:00',
-    people: '4명',
-    status: 'upcoming',
-    icon: '🍽️'
-  },
-  {
-    id: '2',
-    restaurantName: '스시 오마카세',
-    date: '2024.01.15',
-    time: '18:30',
-    people: '2명',
-    status: 'completed',
-    icon: '🍣'
-  },
-  {
-    id: '3',
-    restaurantName: '비스트로 파리',
-    date: '2024.01.10',
-    time: '12:00',
-    people: '3명',
-    status: 'completed',
-    icon: '🍷'
-  }
-];
-
 export const ReservationsPage: React.FC = () => {
+  const [reservations, setReservations] = useState<ReservationItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchReservations = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:8080/api/reservations?memberId=1');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch reservations');
+        }
+        
+        const data = await response.json();
+        setReservations(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservations();
+  }, []);
   const getStatusStyle = (status: ReservationItem['status']) => {
     switch (status) {
       case 'upcoming':
@@ -53,12 +48,34 @@ export const ReservationsPage: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div style={styles.container}>
+        <h2 style={styles.title}>예약 내역</h2>
+        <div style={styles.loadingContainer}>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={styles.container}>
+        <h2 style={styles.title}>예약 내역</h2>
+        <div style={styles.errorContainer}>
+          <p>Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>예약 내역</h2>
       
       <div style={styles.reservationList}>
-        {mockReservations.map((reservation) => {
+        {reservations.map((reservation) => {
           const statusStyle = getStatusStyle(reservation.status);
           return (
             <div key={reservation.id} style={styles.reservationCard}>
@@ -181,6 +198,16 @@ const styles = {
   },
   cancelButton: {
     borderColor: '#FF3B30',
+    color: '#FF3B30',
+  },
+  loadingContainer: {
+    padding: theme.spacing.xl,
+    textAlign: 'center' as const,
+    color: theme.colors.textSecondary,
+  },
+  errorContainer: {
+    padding: theme.spacing.xl,
+    textAlign: 'center' as const,
     color: '#FF3B30',
   },
 };

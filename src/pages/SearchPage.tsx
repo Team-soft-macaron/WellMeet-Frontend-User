@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
 import { RestaurantCard } from '../components/Home/RestaurantCard';
-
-interface SearchPageProps {
-  onBack: () => void;
-  onRestaurantClick: (id: string) => void;
-}
 
 const recentSearches = ['스시', '강남 한식', '프라이빗 룸'];
 const popularSearches = [
@@ -16,32 +12,39 @@ const popularSearches = [
   '가족 모임'
 ];
 
-const mockSearchResults = [
-  {
-    id: '1',
-    name: '스시 오마카세',
-    category: '일식',
-    distance: '600m',
-    rating: 4.8,
-    icon: '🍣'
-  },
-  {
-    id: '2',
-    name: '스시 하나',
-    category: '일식',
-    distance: '1.2km',
-    rating: 4.6,
-    icon: '🍣'
-  }
-];
+interface SearchResult {
+  id: string;
+  name: string;
+  address: string;
+  distance: string;
+  rating: number;
+  thumbnail: string;
+}
 
-export const SearchPage: React.FC<SearchPageProps> = ({ onBack, onRestaurantClick }) => {
+export const SearchPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const [showResults, setShowResults] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (searchText.trim()) {
-      setShowResults(true);
+      setLoading(true);
+      try {
+        const response = await fetch(`http://localhost:8080/api/restaurants/search?query=${encodeURIComponent(searchText)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setSearchResults(data);
+          setShowResults(true);
+        } else {
+          console.error('Search failed');
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -53,18 +56,36 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack, onRestaurantClic
 
   const handleRecentSearch = (keyword: string) => {
     setSearchText(keyword);
-    setShowResults(true);
+    handleSearchWithKeyword(keyword);
   };
 
   const handlePopularSearch = (keyword: string) => {
     setSearchText(keyword);
-    setShowResults(true);
+    handleSearchWithKeyword(keyword);
+  };
+
+  const handleSearchWithKeyword = async (keyword: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8080/api/restaurants/search?query=${encodeURIComponent(keyword)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data);
+        setShowResults(true);
+      } else {
+        console.error('Search failed');
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <button style={styles.backButton} onClick={onBack}>←</button>
+        <button style={styles.backButton} onClick={() => navigate(-1)}>←</button>
         <h1 style={styles.headerTitle}>검색</h1>
         <div style={styles.headerSpacer} />
       </div>
@@ -87,15 +108,23 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack, onRestaurantClic
         {showResults ? (
           <div>
             <h4 style={styles.resultTitle}>검색 결과</h4>
-            <div>
-              {mockSearchResults.map((restaurant) => (
-                <RestaurantCard
-                  key={restaurant.id}
-                  {...restaurant}
-                  onClick={() => onRestaurantClick(restaurant.id)}
-                />
-              ))}
-            </div>
+            {loading ? (
+              <div style={styles.loading}>Loading...</div>
+            ) : (
+              <div>
+                {searchResults.length > 0 ? (
+                  searchResults.map((restaurant) => (
+                    <RestaurantCard
+                      key={restaurant.id}
+                      {...restaurant}
+                      onClick={() => navigate(`/restaurant/${restaurant.id}`)}
+                    />
+                  ))
+                ) : (
+                  <div style={styles.noResults}>검색 결과가 없습니다.</div>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <div>
@@ -250,5 +279,15 @@ const styles = {
     color: '#FF3B30',
     marginRight: theme.spacing.lg,
     width: 20,
+  },
+  loading: {
+    padding: theme.spacing.xl,
+    textAlign: 'center' as const,
+    color: theme.colors.textSecondary,
+  },
+  noResults: {
+    padding: theme.spacing.xl,
+    textAlign: 'center' as const,
+    color: theme.colors.textSecondary,
   },
 };
