@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
 import { ChatMessage } from '../components/AIChat/ChatMessage';
 import { ChatInput } from '../components/AIChat/ChatInput';
 import { QuickReply } from '../components/AIChat/QuickReply';
 import { RestaurantCard } from '../components/AIChat/RestaurantCard';
-import { RestaurantDetailPage } from './RestaurantDetailPage';
 
 interface ChatMessageType {
   id: string;
@@ -35,9 +35,9 @@ const initialMessage: ChatMessageType = {
 };
 
 export const AIRecommendPage: React.FC = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<ChatMessageType[]>([initialMessage]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -115,15 +115,6 @@ export const AIRecommendPage: React.FC = () => {
   const lastMessage = messages[messages.length - 1];
   const showQuickReplies = lastMessage.type === 'ai' && lastMessage.quickReplies && !isLoading;
 
-  if (selectedRestaurantId) {
-    return (
-      <RestaurantDetailPage
-        restaurantId={selectedRestaurantId}
-        onBack={() => setSelectedRestaurantId(null)}
-        onBooking={() => { }}
-      />
-    );
-  }
 
   return (
     <div style={styles.container}>
@@ -146,7 +137,7 @@ export const AIRecommendPage: React.FC = () => {
                     rating={r.rating}
                     vibe={r.vibe}
                     thumbnail={r.thumbnail}
-                    onClick={() => r.id && setSelectedRestaurantId(r.id)}
+                    onClick={() => r.id && navigate(`/restaurant/${r.id}`)}
                   />
                 ))}
               </div>

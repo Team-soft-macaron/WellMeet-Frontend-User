@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
 import { SearchBar } from '../components/Home/SearchBar';
 import { PremiumCard } from '../components/Home/PremiumCard';
@@ -12,48 +13,18 @@ const formatDistance = (meters: number): string => {
   }
 };
 
-const mockRestaurants = [
-  {
-    id: '1',
-    name: '정식당',
-    address: '강남구',
-    distance: formatDistance(500),
-    rating: 4.9,
-    thumbnail: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'
-  },
-  {
-    id: '2',
-    name: '한우 명가',
-    address: '강남구',
-    distance: formatDistance(800),
-    rating: 4.7,
-    thumbnail: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800'
-  },
-  {
-    id: '3',
-    name: '비스트로 파리',
-    address: '강남구',
-    distance: formatDistance(1200),
-    rating: 4.6,
-    thumbnail: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800'
-  },
-  {
-    id: '4',
-    name: '스시 오마카세',
-    address: '강남구',
-    distance: formatDistance(600),
-    rating: 4.8,
-    thumbnail: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800'
-  }
-];
-
-interface HomePageProps {
-  onSearch: () => void;
-  onRestaurantClick: (id: string) => void;
+interface Restaurant {
+  id: string;
+  name: string;
+  address: string;
+  distance: string;
+  rating: number;
+  thumbnail: string;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ onSearch, onRestaurantClick }) => {
-  const [restaurants, setRestaurants] = useState(mockRestaurants);
+export const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,7 +50,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSearch, onRestaurantClick 
               
               const data = await response.json();
               // Format distance for each restaurant
-              const formattedData = data.map((restaurant: { id: string; name: string; address: string; distance: number; rating: number; thumbnail: string }) => ({
+              const formattedData = data.map((restaurant: Restaurant & { distance: number }) => ({
                 ...restaurant,
                 distance: formatDistance(restaurant.distance)
               }));
@@ -87,7 +58,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onSearch, onRestaurantClick 
             } catch (err) {
               console.error('Error fetching restaurants:', err);
               setError('Failed to load nearby restaurants');
-              // Keep using mock data on error
             } finally {
               setLoading(false);
             }
@@ -96,7 +66,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onSearch, onRestaurantClick 
             console.error('Error getting location:', error);
             setError('Location access denied');
             setLoading(false);
-            // Use mock data if location access is denied
           }
         );
       } else {
@@ -110,7 +79,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSearch, onRestaurantClick 
 
   return (
     <div style={styles.container}>
-      <SearchBar onSearch={onSearch} />
+      <SearchBar onSearch={() => navigate('/search')} />
       
       <PremiumCard />
       
@@ -122,7 +91,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSearch, onRestaurantClick 
           <RestaurantCard
             key={restaurant.id}
             {...restaurant}
-            onClick={() => onRestaurantClick(restaurant.id)}
+            onClick={() => navigate(`/restaurant/${restaurant.id}`)}
           />
         ))}
       </div>
