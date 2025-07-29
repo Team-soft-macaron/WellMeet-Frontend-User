@@ -193,8 +193,8 @@ export default function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto relative">
-        <div className="flex-1 overflow-hidden">
+      <div className="h-screen bg-background flex flex-col max-w-md mx-auto relative">
+        <div className="flex-1 overflow-hidden pb-16">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/chat" element={<ChatPage />} />
@@ -247,9 +247,11 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
-        <BottomNavigation
-          notificationCount={unreadCount}
-        />
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50">
+          <BottomNavigation
+            notificationCount={unreadCount}
+          />
+        </div>
       </div>
     </Router>
   );

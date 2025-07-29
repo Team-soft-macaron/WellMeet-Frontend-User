@@ -284,77 +284,81 @@ export function BookingList() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-4">
-            <TabsTrigger value="upcoming">진행중</TabsTrigger>
-            <TabsTrigger value="past">완료</TabsTrigger>
-            <TabsTrigger value="cancelled">취소</TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <div className="px-4 pt-4 pb-2">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="upcoming">진행중</TabsTrigger>
+              <TabsTrigger value="past">완료</TabsTrigger>
+              <TabsTrigger value="cancelled">취소</TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="upcoming" className="p-4 space-y-4 mt-4">
-            {upcomingBookings.length > 0 ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <h2 className="font-medium">예정된 예약</h2>
-                  <Badge variant="secondary">{upcomingBookings.length}건</Badge>
+          <div className="flex-1 overflow-y-auto">
+            <TabsContent value="upcoming" className="p-4 pb-10 space-y-4 mt-4 h-full">
+              {upcomingBookings.length > 0 ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-medium">예정된 예약</h2>
+                    <Badge variant="secondary">{upcomingBookings.length}건</Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {upcomingBookings.map(renderBookingCard)}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">예정된 예약이 없습니다</p>
+                  <Button className="mt-4">새 예약 만들기</Button>
                 </div>
-                <div className="space-y-3">
-                  {upcomingBookings.map(renderBookingCard)}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">예정된 예약이 없습니다</p>
-                <Button className="mt-4">새 예약 만들기</Button>
-              </div>
-            )}
-          </TabsContent>
+              )}
+            </TabsContent>
 
-          <TabsContent value="past" className="p-4 space-y-4 mt-4">
-            {pastBookings.filter(b => b.status === 'completed').length > 0 ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <h2 className="font-medium">지난 예약</h2>
-                  <Badge variant="secondary">
-                    {pastBookings.filter(b => b.status === 'completed').length}건
-                  </Badge>
+            <TabsContent value="past" className="p-4 pb-10 space-y-4 mt-4 h-full">
+              {pastBookings.filter(b => b.status === 'completed').length > 0 ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-medium">지난 예약</h2>
+                    <Badge variant="secondary">
+                      {pastBookings.filter(b => b.status === 'completed').length}건
+                    </Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {pastBookings
+                      .filter(b => b.status === 'completed')
+                      .map(renderBookingCard)}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <Star className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">완료된 예약이 없습니다</p>
                 </div>
-                <div className="space-y-3">
-                  {pastBookings
-                    .filter(b => b.status === 'completed')
-                    .map(renderBookingCard)}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <Star className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">완료된 예약이 없습니다</p>
-              </div>
-            )}
-          </TabsContent>
+              )}
+            </TabsContent>
 
-          <TabsContent value="cancelled" className="p-4 space-y-4 mt-4">
-            {pastBookings.filter(b => b.status === 'cancelled').length > 0 ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <h2 className="font-medium">취소된 예약</h2>
-                  <Badge variant="secondary">
-                    {pastBookings.filter(b => b.status === 'cancelled').length}건
-                  </Badge>
+            <TabsContent value="cancelled" className="p-4 pb-10 space-y-4 mt-4 h-full">
+              {pastBookings.filter(b => b.status === 'cancelled').length > 0 ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-medium">취소된 예약</h2>
+                    <Badge variant="secondary">
+                      {pastBookings.filter(b => b.status === 'cancelled').length}건
+                    </Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {pastBookings
+                      .filter(b => b.status === 'cancelled')
+                      .map(renderBookingCard)}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">취소된 예약이 없습니다</p>
                 </div>
-                <div className="space-y-3">
-                  {pastBookings
-                    .filter(b => b.status === 'cancelled')
-                    .map(renderBookingCard)}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">취소된 예약이 없습니다</p>
-              </div>
-            )}
-          </TabsContent>
+              )}
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>
