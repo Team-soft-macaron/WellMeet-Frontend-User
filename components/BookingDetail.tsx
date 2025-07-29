@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
@@ -22,61 +23,144 @@ interface Booking {
 }
 
 interface BookingDetailProps {
-  booking: Booking;
-  onBack: () => void;
-  onModify?: () => void;
-  onCancel?: () => void;
-  onReview?: () => void;
+  onBookingUpdate: (updatedData: Partial<Booking>) => void;
 }
+
+const mockBookings: Booking[] = [
+  {
+    id: '1',
+    restaurantName: '라비올로',
+    restaurantImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=200&fit=crop',
+    date: '7월 20일 (토)',
+    time: '19:00',
+    partySize: 2,
+    estimatedCost: '30만원',
+    status: 'confirmed',
+    specialRequests: '창가 자리로 부탁드려요',
+    location: '강남구 논현동',
+    phone: '02-1234-5678',
+    confirmationNumber: 'WM240720001',
+    bookedAt: '7월 18일 14:30'
+  },
+  {
+    id: '2',
+    restaurantName: '스시 오마카세',
+    restaurantImage: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=300&h=200&fit=crop',
+    date: '7월 25일 (목)',
+    time: '18:00',
+    partySize: 4,
+    estimatedCost: '72만원',
+    status: 'pending',
+    location: '청담동',
+    phone: '02-2345-6789',
+    confirmationNumber: 'WM240725002',
+    bookedAt: '7월 23일 09:15'
+  },
+  {
+    id: '3',
+    restaurantName: '더 키친',
+    restaurantImage: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=200&fit=crop',
+    date: '7월 10일 (수)',
+    time: '19:30',
+    partySize: 2,
+    estimatedCost: '32만원',
+    status: 'completed',
+    location: '청담동',
+    phone: '02-3456-7890',
+    confirmationNumber: 'WM240710003',
+    bookedAt: '7월 8일 16:20'
+  }
+];
 
 const getStatusInfo = (status: Booking['status']) => {
   switch (status) {
     case 'confirmed':
-      return { 
-        label: '예약 확정', 
-        color: 'bg-green-500', 
+      return {
+        label: '예약 확정',
+        color: 'bg-green-500',
         textColor: 'text-green-700',
         bgColor: 'bg-green-50 border-green-200'
       };
     case 'pending':
-      return { 
-        label: '예약 대기', 
-        color: 'bg-yellow-500', 
+      return {
+        label: '예약 대기',
+        color: 'bg-yellow-500',
         textColor: 'text-yellow-700',
         bgColor: 'bg-yellow-50 border-yellow-200'
       };
     case 'completed':
-      return { 
-        label: '방문 완료', 
-        color: 'bg-gray-500', 
+      return {
+        label: '방문 완료',
+        color: 'bg-gray-500',
         textColor: 'text-gray-700',
         bgColor: 'bg-gray-50 border-gray-200'
       };
     case 'cancelled':
-      return { 
-        label: '예약 취소', 
-        color: 'bg-red-500', 
+      return {
+        label: '예약 취소',
+        color: 'bg-red-500',
         textColor: 'text-red-700',
         bgColor: 'bg-red-50 border-red-200'
       };
     default:
-      return { 
-        label: '알 수 없음', 
-        color: 'bg-gray-500', 
+      return {
+        label: '알 수 없음',
+        color: 'bg-gray-500',
         textColor: 'text-gray-700',
         bgColor: 'bg-gray-50 border-gray-200'
       };
   }
 };
 
-export function BookingDetail({ booking, onBack, onModify, onCancel, onReview }: BookingDetailProps) {
+export function BookingDetail({ onBookingUpdate }: BookingDetailProps) {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  // URL 파라미터로 받은 id로 예약 정보 찾기
+  const booking = mockBookings.find(b => b.id === id);
+
+  if (!booking) {
+    return (
+      <div className="flex flex-col h-full bg-background">
+        <div className="flex items-center p-4 border-b border-border">
+          <Button variant="ghost" size="icon" className="mr-3" onClick={() => navigate('/bookings')}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg font-medium">예약 상세정보</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">예약을 찾을 수 없습니다</p>
+        </div>
+      </div>
+    );
+  }
+
   const statusInfo = getStatusInfo(booking.status);
+
+  const handleBack = () => {
+    navigate('/bookings');
+  };
+
+  const handleModify = () => {
+    navigate(`/bookings/${booking.id}/edit`);
+  };
+
+  const handleCancel = () => {
+    if (confirm(`${booking.restaurantName} 예약을 취소하시겠습니까?`)) {
+      onBookingUpdate({ status: 'cancelled' });
+      navigate('/bookings');
+    }
+  };
+
+  const handleReview = () => {
+    alert(`${booking.restaurantName} 리뷰 작성 페이지로 이동합니다`);
+  };
 
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Header */}
       <div className="flex items-center p-4 border-b border-border">
-        <Button variant="ghost" size="icon" className="mr-3" onClick={onBack}>
+        <Button variant="ghost" size="icon" className="mr-3" onClick={handleBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-lg font-medium">예약 상세정보</h1>
@@ -126,9 +210,9 @@ export function BookingDetail({ booking, onBack, onModify, onCancel, onReview }:
               </div>
             </div>
             <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="flex-1"
                 onClick={() => booking.phone && window.open(`tel:${booking.phone}`)}
               >
@@ -155,7 +239,7 @@ export function BookingDetail({ booking, onBack, onModify, onCancel, onReview }:
                 </div>
                 <span className="font-medium">{booking.date} {booking.time}</span>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
@@ -220,33 +304,33 @@ export function BookingDetail({ booking, onBack, onModify, onCancel, onReview }:
       <div className="p-4 border-t border-border space-y-3">
         {booking.status === 'confirmed' || booking.status === 'pending' ? (
           <div className="flex space-x-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex-1"
-              onClick={onModify}
+              onClick={handleModify}
             >
               예약 수정
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="text-red-600 hover:text-red-700"
-              onClick={onCancel}
+              onClick={handleCancel}
             >
               예약 취소
             </Button>
           </div>
         ) : booking.status === 'completed' ? (
           <div className="flex space-x-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex-1"
               onClick={() => alert('재예약 기능은 구현 중입니다')}
             >
               재예약하기
             </Button>
-            <Button 
+            <Button
               className="flex items-center"
-              onClick={onReview}
+              onClick={handleReview}
             >
               <Star className="h-4 w-4 mr-1" />
               리뷰 작성

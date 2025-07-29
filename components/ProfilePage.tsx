@@ -1,20 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { 
-  ArrowLeft, 
-  Edit2, 
-  Bell, 
-  User, 
-  Crown, 
-  CreditCard, 
-  Phone, 
-  HelpCircle, 
-  Settings, 
-  FileText, 
-  Shield, 
+import {
+  ArrowLeft,
+  Edit2,
+  Bell,
+  User,
+  Crown,
+  CreditCard,
+  Phone,
+  HelpCircle,
+  Settings,
+  FileText,
+  Shield,
   LogOut,
   Star,
   Heart,
@@ -32,8 +33,7 @@ interface User {
 
 interface ProfilePageProps {
   user: User;
-  onBack: () => void;
-  onUserEdit: () => void;
+  onUserUpdate: (updatedUser: User) => void;
 }
 
 const getTierInfo = (tier: User['tier']) => {
@@ -69,63 +69,72 @@ const mockStats = {
   averageRating: 4.6
 };
 
-export function ProfilePage({ user, onBack, onUserEdit }: ProfilePageProps) {
+export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
+  const navigate = useNavigate();
   const tierInfo = getTierInfo(user.tier);
+
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  const handleUserEdit = () => {
+    navigate('/profile/edit');
+  };
 
   const menuItems = [
     {
       icon: Bell,
       label: '알림 설정',
       description: 'SMS, 이메일, 리마인더 설정',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       icon: User,
       label: '개인정보 수정',
       description: '이름, 연락처, 프로필 사진',
-      onClick: onUserEdit
+      onClick: handleUserEdit
     },
     {
       icon: Crown,
       label: '멤버십 관리',
       description: '등급 혜택 및 포인트 확인',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       icon: CreditCard,
       label: '결제 수단 관리',
       description: '카드 등록 및 관리',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       icon: Phone,
       label: '컨시어지 연결',
       description: '1:1 맞춤 상담 서비스',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       icon: HelpCircle,
       label: '고객센터',
       description: 'FAQ, 문의하기',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       icon: Settings,
       label: '앱 설정',
       description: '언어, 알림, 데이터 설정',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       icon: FileText,
       label: '이용약관',
       description: '서비스 이용약관',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       icon: Shield,
       label: '개인정보처리방침',
       description: '개인정보 처리 및 보호',
-      onClick: () => {}
+      onClick: () => { }
     }
   ];
 
@@ -133,7 +142,7 @@ export function ProfilePage({ user, onBack, onUserEdit }: ProfilePageProps) {
     <div className="flex flex-col h-full bg-background">
       {/* Header */}
       <div className="flex items-center p-4 border-b border-border">
-        <Button variant="ghost" size="icon" className="mr-3" onClick={onBack}>
+        <Button variant="ghost" size="icon" className="mr-3" onClick={handleBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-lg font-medium">내 정보</h1>
@@ -152,23 +161,23 @@ export function ProfilePage({ user, onBack, onUserEdit }: ProfilePageProps) {
                     {user.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <Button 
-                  size="icon" 
+                <Button
+                  size="icon"
                   className="absolute -bottom-1 -right-1 w-6 h-6"
                   variant="secondary"
                 >
                   <Edit2 className="h-3 w-3" />
                 </Button>
               </div>
-              
+
               <div className="space-y-2">
                 <h2 className="text-xl font-medium">{user.name}</h2>
                 <Badge className={`${tierInfo.color} ${tierInfo.bgColor} border-0`}>
                   {tierInfo.icon} {tierInfo.label}
                 </Badge>
               </div>
-              
-              <Button variant="outline" size="sm" onClick={onUserEdit}>
+
+              <Button variant="outline" size="sm" onClick={handleUserEdit}>
                 프로필 수정
               </Button>
             </div>
@@ -185,7 +194,7 @@ export function ProfilePage({ user, onBack, onUserEdit }: ProfilePageProps) {
                 </div>
                 <p className="text-sm text-muted-foreground">작성한 리뷰</p>
               </div>
-              
+
               <div className="text-center space-y-1">
                 <div className="flex items-center justify-center space-x-1">
                   <Heart className="h-4 w-4 text-red-500" />
@@ -193,7 +202,7 @@ export function ProfilePage({ user, onBack, onUserEdit }: ProfilePageProps) {
                 </div>
                 <p className="text-sm text-muted-foreground">찜한 식당</p>
               </div>
-              
+
               <div className="text-center space-y-1">
                 <div className="flex items-center justify-center space-x-1">
                   <Calendar className="h-4 w-4 text-blue-500" />
@@ -201,7 +210,7 @@ export function ProfilePage({ user, onBack, onUserEdit }: ProfilePageProps) {
                 </div>
                 <p className="text-sm text-muted-foreground">총 예약</p>
               </div>
-              
+
               <div className="text-center space-y-1">
                 <div className="flex items-center justify-center space-x-1">
                   <Star className="h-4 w-4 text-green-500" />

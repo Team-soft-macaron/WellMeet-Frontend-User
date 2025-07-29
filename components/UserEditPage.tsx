@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
@@ -15,12 +16,11 @@ interface User {
 
 interface UserEditPageProps {
   user: User;
-  onBack: () => void;
   onSave: (updatedUser: User) => void;
-  returnPage?: 'profile' | 'reservation';
 }
 
-export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: UserEditPageProps) {
+export function UserEditPage({ user, onSave }: UserEditPageProps) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<User>({
     ...user
   });
@@ -30,6 +30,10 @@ export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: U
     email?: string;
     phone?: string;
   }>({});
+
+  const handleBack = () => {
+    navigate('/profile');
+  };
 
   // 입력 검증
   const validateForm = () => {
@@ -73,7 +77,7 @@ export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: U
     if (field === 'phone') {
       value = formatPhoneNumber(value);
     }
-    
+
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -94,12 +98,12 @@ export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: U
     }
 
     setIsLoading(true);
-    
+
     // 서버 업데이트 시뮬레이션
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     onSave(formData);
-    setIsLoading(false);
+    navigate('/profile');
   };
 
   const getTierDisplayName = (tier: string) => {
@@ -121,16 +125,16 @@ export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: U
   };
 
   const hasChanges = () => {
-    return formData.name !== user.name || 
-           formData.email !== user.email || 
-           formData.phone !== user.phone;
+    return formData.name !== user.name ||
+      formData.email !== user.email ||
+      formData.phone !== user.phone;
   };
 
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Header */}
       <div className="flex items-center p-4 border-b border-border">
-        <Button variant="ghost" size="icon" className="mr-3" onClick={onBack}>
+        <Button variant="ghost" size="icon" className="mr-3" onClick={handleBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-lg font-medium">개인정보 수정</h1>
@@ -145,8 +149,8 @@ export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: U
               <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
                 <User className="h-10 w-10 text-primary-foreground" />
               </div>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs"
                 variant="outline"
               >
@@ -162,9 +166,9 @@ export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: U
                 {getTierDisplayName(formData.tier)} 멤버
               </div>
               <div className="text-xs text-muted-foreground">
-                {formData.tier === 'vip' ? '최고 등급 회원입니다' : 
-                 formData.tier === 'premium' ? '다음 달 VIP 승급 가능' : 
-                 '5회 더 이용시 프리미엄 승급'}
+                {formData.tier === 'vip' ? '최고 등급 회원입니다' :
+                  formData.tier === 'premium' ? '다음 달 VIP 승급 가능' :
+                    '5회 더 이용시 프리미엄 승급'}
               </div>
             </div>
           </Card>
@@ -172,7 +176,7 @@ export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: U
           {/* 개인정보 수정 폼 */}
           <div className="space-y-4">
             <h3 className="font-medium">기본 정보</h3>
-            
+
             {/* 이름 */}
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center">
@@ -272,10 +276,10 @@ export function UserEditPage({ user, onBack, onSave, returnPage = 'profile' }: U
       {/* Fixed Bottom Button */}
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-background border-t border-border">
         <div className="flex space-x-3">
-          <Button variant="outline" className="flex-1" onClick={onBack}>
+          <Button variant="outline" className="flex-1" onClick={handleBack}>
             취소
           </Button>
-          <Button 
+          <Button
             className="flex-1"
             onClick={handleSave}
             disabled={!hasChanges() || isLoading}

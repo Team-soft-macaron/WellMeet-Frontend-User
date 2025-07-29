@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
@@ -37,10 +38,54 @@ interface Booking {
 }
 
 interface BookingEditProps {
-  booking: Booking;
-  onBack: () => void;
-  onSave: (updatedBooking: Partial<Booking>) => void;
+  onBookingUpdate: (updatedData: Partial<Booking>) => void;
 }
+
+const mockBookings: Booking[] = [
+  {
+    id: '1',
+    restaurantName: '라비올로',
+    restaurantImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=200&fit=crop',
+    date: '7월 20일 (토)',
+    time: '19:00',
+    partySize: 2,
+    estimatedCost: '30만원',
+    status: 'confirmed',
+    specialRequests: '창가 자리로 부탁드려요',
+    location: '강남구 논현동',
+    phone: '02-1234-5678',
+    confirmationNumber: 'WM240720001',
+    bookedAt: '7월 18일 14:30'
+  },
+  {
+    id: '2',
+    restaurantName: '스시 오마카세',
+    restaurantImage: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=300&h=200&fit=crop',
+    date: '7월 25일 (목)',
+    time: '18:00',
+    partySize: 4,
+    estimatedCost: '72만원',
+    status: 'pending',
+    location: '청담동',
+    phone: '02-2345-6789',
+    confirmationNumber: 'WM240725002',
+    bookedAt: '7월 23일 09:15'
+  },
+  {
+    id: '3',
+    restaurantName: '더 키친',
+    restaurantImage: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=200&fit=crop',
+    date: '7월 10일 (수)',
+    time: '19:30',
+    partySize: 2,
+    estimatedCost: '32만원',
+    status: 'completed',
+    location: '청담동',
+    phone: '02-3456-7890',
+    confirmationNumber: 'WM240710003',
+    bookedAt: '7월 8일 16:20'
+  }
+];
 
 const timeSlots = [
   "11:30",
@@ -61,11 +106,29 @@ const timeSlots = [
 
 const partySizes = [1, 2, 3, 4, 5, 6, 7, 8];
 
-export function BookingEdit({
-  booking,
-  onBack,
-  onSave,
-}: BookingEditProps) {
+export function BookingEdit({ onBookingUpdate }: BookingEditProps) {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  // URL 파라미터로 받은 id로 예약 정보 찾기
+  const booking = mockBookings.find(b => b.id === id);
+
+  if (!booking) {
+    return (
+      <div className="flex flex-col h-full bg-background">
+        <div className="flex items-center p-4 border-b border-border">
+          <Button variant="ghost" size="icon" className="mr-3" onClick={() => navigate('/bookings')}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg font-medium">예약 수정</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">예약을 찾을 수 없습니다</p>
+        </div>
+      </div>
+    );
+  }
+
   const [formData, setFormData] = useState({
     date: booking.date,
     time: booking.time,
@@ -75,14 +138,19 @@ export function BookingEdit({
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleBack = () => {
+    navigate('/bookings');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     // 수정된 데이터 저장 시뮬레이션
     setTimeout(() => {
-      onSave(formData);
+      onBookingUpdate(formData);
       setIsLoading(false);
+      navigate(`/bookings/${booking.id}`);
     }, 1500);
   };
 
@@ -101,7 +169,7 @@ export function BookingEdit({
           variant="ghost"
           size="icon"
           className="mr-3"
-          onClick={onBack}
+          onClick={handleBack}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -316,7 +384,7 @@ export function BookingEdit({
           <Button
             variant="outline"
             className="flex-1"
-            onClick={onBack}
+            onClick={handleBack}
             disabled={isLoading}
           >
             취소

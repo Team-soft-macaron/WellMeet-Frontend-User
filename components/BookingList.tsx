@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
@@ -20,12 +21,6 @@ interface Booking {
   phone?: string;
   confirmationNumber?: string;
   bookedAt?: string;
-}
-
-interface BookingListProps {
-  onBack: () => void;
-  onBookingSelect: (booking: Booking) => void;
-  onBookingEdit: (booking: Booking) => void;
 }
 
 const mockBookings: Booking[] = [
@@ -77,56 +72,69 @@ const mockBookings: Booking[] = [
 const getStatusInfo = (status: Booking['status']) => {
   switch (status) {
     case 'confirmed':
-      return { 
-        label: '확정', 
-        color: 'bg-green-500', 
+      return {
+        label: '확정',
+        color: 'bg-green-500',
         textColor: 'text-green-700',
         bgColor: 'bg-green-50 border-green-200'
       };
     case 'pending':
-      return { 
-        label: '대기', 
-        color: 'bg-yellow-500', 
+      return {
+        label: '대기',
+        color: 'bg-yellow-500',
         textColor: 'text-yellow-700',
         bgColor: 'bg-yellow-50 border-yellow-200'
       };
     case 'completed':
-      return { 
-        label: '완료', 
-        color: 'bg-gray-500', 
+      return {
+        label: '완료',
+        color: 'bg-gray-500',
         textColor: 'text-gray-700',
         bgColor: 'bg-gray-50 border-gray-200'
       };
     case 'cancelled':
-      return { 
-        label: '취소', 
-        color: 'bg-red-500', 
+      return {
+        label: '취소',
+        color: 'bg-red-500',
         textColor: 'text-red-700',
         bgColor: 'bg-red-50 border-red-200'
       };
     default:
-      return { 
-        label: '알 수 없음', 
-        color: 'bg-gray-500', 
+      return {
+        label: '알 수 없음',
+        color: 'bg-gray-500',
         textColor: 'text-gray-700',
         bgColor: 'bg-gray-50 border-gray-200'
       };
   }
 };
 
-export function BookingList({ onBack, onBookingSelect, onBookingEdit }: BookingListProps) {
+export function BookingList() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('upcoming');
 
-  const upcomingBookings = mockBookings.filter(b => 
+  const upcomingBookings = mockBookings.filter(b =>
     b.status === 'confirmed' || b.status === 'pending'
   );
-  const pastBookings = mockBookings.filter(b => 
+  const pastBookings = mockBookings.filter(b =>
     b.status === 'completed' || b.status === 'cancelled'
   );
 
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  const handleBookingSelect = (booking: Booking) => {
+    navigate(`/bookings/${booking.id}`);
+  };
+
+  const handleBookingEdit = (booking: Booking) => {
+    navigate(`/bookings/${booking.id}/edit`);
+  };
+
   const renderBookingCard = (booking: Booking) => {
     const statusInfo = getStatusInfo(booking.status);
-    
+
     return (
       <Card key={booking.id} className={`p-4 ${statusInfo.bgColor}`}>
         <div className="space-y-3">
@@ -180,25 +188,25 @@ export function BookingList({ onBack, onBookingSelect, onBookingEdit }: BookingL
           <div className="flex space-x-2 pt-2">
             {booking.status === 'confirmed' || booking.status === 'pending' ? (
               <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="flex-1"
-                  onClick={() => onBookingSelect(booking)}
+                  onClick={() => handleBookingSelect(booking)}
                 >
                   상세보기
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="flex-1"
-                  onClick={() => onBookingEdit(booking)}
+                  onClick={() => handleBookingEdit(booking)}
                 >
                   수정
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="text-red-600 hover:text-red-700"
                   onClick={() => confirm(`${booking.restaurantName} 예약을 취소하시겠습니까?`)}
                 >
@@ -207,25 +215,25 @@ export function BookingList({ onBack, onBookingSelect, onBookingEdit }: BookingL
               </>
             ) : booking.status === 'completed' ? (
               <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="flex-1"
-                  onClick={() => onBookingSelect(booking)}
+                  onClick={() => handleBookingSelect(booking)}
                 >
                   상세보기
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="flex-1"
                   onClick={() => alert(`${booking.restaurantName} 재예약을 진행합니다.`)}
                 >
                   재예약
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="flex items-center"
                   onClick={() => alert(`${booking.restaurantName} 리뷰 작성 페이지로 이동합니다.`)}
                 >
@@ -235,17 +243,17 @@ export function BookingList({ onBack, onBookingSelect, onBookingEdit }: BookingL
               </>
             ) : (
               <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="flex-1"
                   onClick={() => alert(`${booking.restaurantName} 재예약을 진행합니다.`)}
                 >
                   재예약하기
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="text-red-600"
                   onClick={() => confirm(`${booking.restaurantName} 예약 기록을 삭제하시겠습니까?`)}
                 >
@@ -264,7 +272,7 @@ export function BookingList({ onBack, onBookingSelect, onBookingEdit }: BookingL
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" className="mr-3" onClick={onBack}>
+          <Button variant="ghost" size="icon" className="mr-3" onClick={handleBack}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-medium">내 예약</h1>

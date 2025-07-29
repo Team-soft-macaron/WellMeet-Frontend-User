@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
@@ -18,7 +19,6 @@ interface Notification {
 
 interface NotificationPageProps {
   notifications: Notification[];
-  onBack: () => void;
   onNotificationAction: (notification: Notification, action: string) => void;
   onMarkAllAsRead: () => void;
   onNotificationSettings: () => void;
@@ -54,13 +54,18 @@ const getNotificationColor = (type: Notification['type']) => {
   }
 };
 
-export function NotificationPage({ 
-  notifications, 
-  onBack, 
-  onNotificationAction, 
-  onMarkAllAsRead, 
-  onNotificationSettings 
+export function NotificationPage({
+  notifications,
+  onNotificationAction,
+  onMarkAllAsRead,
+  onNotificationSettings
 }: NotificationPageProps) {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate('/');
+  };
+
   const groupedNotifications = notifications.reduce((groups, notification) => {
     const timeGroup = notification.time;
     if (!groups[timeGroup]) {
@@ -89,7 +94,7 @@ export function NotificationPage({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" className="mr-3" onClick={onBack}>
+          <Button variant="ghost" size="icon" className="mr-3" onClick={handleBack}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
@@ -124,21 +129,20 @@ export function NotificationPage({
                       {groupNotifications.length}개
                     </Badge>
                   </div>
-                  
+
                   <div className="space-y-2">
                     {groupNotifications.map((notification) => (
-                      <Card 
+                      <Card
                         key={notification.id}
-                        className={`p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
-                          !notification.isRead ? 'border-l-4 border-l-blue-500' : ''
-                        } ${getNotificationColor(notification.type)}`}
+                        className={`p-4 cursor-pointer transition-colors hover:bg-muted/50 ${!notification.isRead ? 'border-l-4 border-l-blue-500' : ''
+                          } ${getNotificationColor(notification.type)}`}
                         onClick={() => handleNotificationClick(notification)}
                       >
                         <div className="flex space-x-3">
                           <div className="flex-shrink-0 mt-1">
                             {getNotificationIcon(notification.type)}
                           </div>
-                          
+
                           <div className="flex-1 space-y-1">
                             <div className="flex items-start justify-between">
                               <h3 className="font-medium text-sm">{notification.title}</h3>
@@ -146,57 +150,57 @@ export function NotificationPage({
                                 <div className="w-2 h-2 bg-blue-500 rounded-full mt-1 ml-2"></div>
                               )}
                             </div>
-                            
+
                             <p className="text-sm text-foreground">
                               {notification.message}
                             </p>
-                            
+
                             <p className="text-sm text-muted-foreground">
                               {notification.detail}
                             </p>
-                            
+
                             <div className="flex items-center justify-between pt-2">
                               <span className="text-xs text-muted-foreground">
                                 {notification.time}
                               </span>
-                              
+
                               {notification.type === 'booking_confirmed' && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
                                   className="text-xs text-green-700 hover:text-green-800"
                                   onClick={(e) => handleActionClick(notification, 'booking_detail', e)}
                                 >
                                   예약 상세보기
                                 </Button>
                               )}
-                              
+
                               {notification.type === 'review_reply' && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
                                   className="text-xs text-purple-700 hover:text-purple-800"
                                   onClick={(e) => handleActionClick(notification, 'review_reply', e)}
                                 >
                                   답글 확인하기
                                 </Button>
                               )}
-                              
+
                               {notification.type === 'reminder' && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
                                   className="text-xs text-blue-700 hover:text-blue-800"
                                   onClick={(e) => handleActionClick(notification, 'booking_list', e)}
                                 >
                                   예약 확인하기
                                 </Button>
                               )}
-                              
+
                               {notification.type === 'concierge_message' && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
                                   className="text-xs text-orange-700 hover:text-orange-800"
                                   onClick={(e) => handleActionClick(notification, 'concierge', e)}
                                 >
@@ -223,7 +227,7 @@ export function NotificationPage({
                   새로운 알림이 있으면 여기에 표시됩니다
                 </p>
               </div>
-              <Button variant="outline" onClick={onBack}>
+              <Button variant="outline" onClick={handleBack}>
                 홈으로 돌아가기
               </Button>
             </div>
@@ -235,18 +239,18 @@ export function NotificationPage({
       {notifications.length > 0 && (
         <div className="border-t border-border p-4">
           <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="flex-1"
               onClick={onMarkAllAsRead}
               disabled={unreadCount === 0}
             >
               {unreadCount > 0 ? `모두 읽음 표시 (${unreadCount})` : '모두 읽음'}
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="flex-1"
               onClick={onNotificationSettings}
             >
