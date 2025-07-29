@@ -1,62 +1,67 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { 
-  Home, 
-  MessageCircle, 
-  Calendar, 
-  Heart, 
+import {
+  Home,
+  MessageCircle,
+  Calendar,
+  Heart,
   User,
   Bell
 } from 'lucide-react';
 
-type Page = 'home' | 'chat' | 'restaurant' | 'reservation' | 'bookings' | 'favorites' | 'profile' | 'notifications';
-
 interface BottomNavigationProps {
-  currentPage: Page;
-  onPageChange: (page: Page) => void;
   notificationCount?: number;
 }
 
-export function BottomNavigation({ currentPage, onPageChange, notificationCount = 0 }: BottomNavigationProps) {
+export function BottomNavigation({ notificationCount = 0 }: BottomNavigationProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const navigationItems = [
     {
-      id: 'home' as Page,
+      id: 'home',
       label: '홈',
       icon: Home,
-      onClick: () => onPageChange('home')
+      path: '/',
+      onClick: () => navigate('/')
     },
     {
-      id: 'chat' as Page,
+      id: 'chat',
       label: 'AI추천',
       icon: MessageCircle,
-      onClick: () => onPageChange('chat')
+      path: '/chat',
+      onClick: () => navigate('/chat')
     },
     {
-      id: 'bookings' as Page,
+      id: 'bookings',
       label: '예약',
       icon: Calendar,
-      onClick: () => onPageChange('bookings')
+      path: '/bookings',
+      onClick: () => navigate('/bookings')
     },
     {
-      id: 'notifications' as Page,
+      id: 'notifications',
       label: '알림',
       icon: Bell,
-      onClick: () => onPageChange('notifications'),
+      path: '/notifications',
+      onClick: () => navigate('/notifications'),
       badge: notificationCount > 0 ? notificationCount : undefined
     },
     {
-      id: 'profile' as Page,
+      id: 'profile',
       label: '내정보',
       icon: User,
-      onClick: () => onPageChange('profile')
+      path: '/profile',
+      onClick: () => navigate('/profile')
     }
   ];
 
   // Only show bottom nav on main pages
-  const showOnPages: Page[] = ['home', 'chat', 'bookings', 'notifications', 'profile'];
-  
-  if (!showOnPages.includes(currentPage)) {
+  const showOnPages = ['/', '/chat', '/bookings', '/notifications', '/profile'];
+
+  if (!showOnPages.includes(location.pathname)) {
     return null;
   }
 
@@ -64,23 +69,22 @@ export function BottomNavigation({ currentPage, onPageChange, notificationCount 
     <div className="border-t border-border bg-background">
       <div className="flex items-center justify-around px-2 py-1">
         {navigationItems.map((item) => {
-          const isActive = currentPage === item.id;
+          const isActive = location.pathname === item.path;
           const Icon = item.icon;
-          
+
           return (
             <Button
               key={item.id}
               variant="ghost"
               size="sm"
-              className={`flex flex-col items-center space-y-1 h-auto py-2 px-3 relative ${
-                isActive ? 'text-blue-600' : 'text-muted-foreground'
-              }`}
+              className={`flex flex-col items-center space-y-1 h-auto py-2 px-3 relative ${isActive ? 'text-blue-600' : 'text-muted-foreground'
+                }`}
               onClick={item.onClick}
             >
               <div className="relative">
                 <Icon className={`h-5 w-5 ${isActive ? 'text-blue-600' : 'text-muted-foreground'}`} />
                 {item.badge && (
-                  <Badge 
+                  <Badge
                     className="absolute -top-2 -right-2 min-w-[18px] h-[18px] p-0 flex items-center justify-center bg-red-500 text-white text-xs"
                   >
                     {item.badge > 99 ? '99+' : item.badge}

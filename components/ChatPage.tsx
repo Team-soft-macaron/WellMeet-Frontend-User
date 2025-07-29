@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
@@ -28,11 +29,6 @@ interface Restaurant {
   image: string;
   description: string;
   reason: string;
-}
-
-interface ChatPageProps {
-  onRestaurantSelect: (restaurant: Restaurant) => void;
-  onReservationRequest: (restaurant: Restaurant) => void;
 }
 
 const mockRecommendations: Restaurant[] = [
@@ -77,7 +73,8 @@ const mockRecommendations: Restaurant[] = [
   }
 ];
 
-export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageProps) {
+export function ChatPage() {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -99,6 +96,18 @@ export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageP
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleRestaurantSelect = (restaurant: Restaurant) => {
+    navigate(`/restaurant/${restaurant.id}`);
+  };
+
+  const handleReservationRequest = (restaurant: Restaurant) => {
+    navigate(`/reservation/${restaurant.id}`);
+  };
+
+  const handleBack = () => {
+    navigate('/');
+  };
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
@@ -184,7 +193,7 @@ export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageP
     <div className="flex flex-col h-full bg-background">
       {/* Header */}
       <div className="flex items-center p-4 border-b border-border bg-background">
-        <Button variant="ghost" size="icon" className="mr-3" onClick={() => window.history.back()}>
+        <Button variant="ghost" size="icon" className="mr-3" onClick={handleBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-lg font-medium">AI 추천</h1>
@@ -199,14 +208,13 @@ export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageP
           >
             <div className={`max-w-[85%] ${message.sender === 'user' ? 'order-1' : 'order-0'}`}>
               <div
-                className={`rounded-2xl px-4 py-3 ${
-                  message.sender === 'user'
+                className={`rounded-2xl px-4 py-3 ${message.sender === 'user'
                     ? 'bg-blue-600 text-white rounded-tr-md'
                     : 'bg-muted rounded-tl-md'
-                }`}
+                  }`}
               >
                 <p className="text-sm leading-relaxed">{message.content}</p>
-                
+
                 {/* Options */}
                 {message.type === 'options' && message.options && (
                   <div className="mt-3 space-y-2">
@@ -228,10 +236,10 @@ export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageP
                 {message.type === 'recommendations' && message.recommendations && (
                   <div className="mt-4 space-y-3">
                     {message.recommendations.map((restaurant, index) => (
-                      <Card 
-                        key={restaurant.id} 
+                      <Card
+                        key={restaurant.id}
                         className="p-4 bg-background border cursor-pointer hover:shadow-md transition-shadow"
-                        onClick={() => onRestaurantSelect(restaurant)}
+                        onClick={() => handleRestaurantSelect(restaurant)}
                       >
                         <div className="space-y-3">
                           <div className="flex items-start space-x-3">
@@ -250,13 +258,13 @@ export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageP
                               </div>
                             </div>
                           </div>
-                          
+
                           <ImageWithFallback
                             src={restaurant.image}
                             alt={restaurant.name}
                             className="w-full h-32 rounded-lg object-cover"
                           />
-                          
+
                           <div className="space-y-2">
                             <div className="flex items-center space-x-4">
                               <div className="flex items-center space-x-1">
@@ -269,22 +277,22 @@ export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageP
                                 <span>{restaurant.location}</span>
                               </div>
                             </div>
-                            
+
                             <p className="text-sm text-muted-foreground">{restaurant.reason}</p>
-                            
+
                             <div className="flex space-x-2 pt-2">
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 className="flex-1"
-                                onClick={() => onReservationRequest(restaurant)}
+                                onClick={() => handleReservationRequest(restaurant)}
                               >
                                 <Calendar className="h-4 w-4 mr-1" />
                                 예약하기
                               </Button>
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
-                                onClick={() => onRestaurantSelect(restaurant)}
+                                onClick={() => handleRestaurantSelect(restaurant)}
                               >
                                 상세보기
                               </Button>
@@ -300,9 +308,9 @@ export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageP
                 )}
               </div>
               <div className="text-xs text-muted-foreground mt-1 px-1">
-                {message.timestamp.toLocaleTimeString('ko-KR', { 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
+                {message.timestamp.toLocaleTimeString('ko-KR', {
+                  hour: '2-digit',
+                  minute: '2-digit'
                 })}
               </div>
             </div>
@@ -336,7 +344,7 @@ export function ChatPage({ onRestaurantSelect, onReservationRequest }: ChatPageP
             className="flex-1 h-12"
             disabled={isTyping}
           />
-          <Button 
+          <Button
             onClick={() => handleSendMessage(inputValue)}
             disabled={!inputValue.trim() || isTyping}
             size="icon"

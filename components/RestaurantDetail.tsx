@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
@@ -20,13 +21,24 @@ interface Restaurant {
 }
 
 interface RestaurantDetailProps {
-  restaurant: Restaurant;
-  onBack: () => void;
-  onReservationRequest: () => void;
-  onViewAllReviews: () => void;
-  isFavorited: boolean;
-  onToggleFavorite: () => void;
+  onToggleFavorite: (restaurantId: string) => void;
+  favorites: string[];
 }
+
+const mockRestaurants: Restaurant[] = [
+  {
+    id: '1',
+    name: '라비올로',
+    category: '이탈리안',
+    priceRange: '15-20만원',
+    rating: 4.5,
+    reviewCount: 124,
+    location: '강남구 논현동',
+    phone: '02-1234-5678',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
+    description: '로맨틱한 분위기로 유명한 이탈리안 레스토랑'
+  }
+];
 
 const mockMenuItems = [
   { name: '트러플 리조또', price: '85,000원', description: '이탈리아산 트러플과 파르미지아노 치즈' },
@@ -71,9 +83,43 @@ const allMockReviews = [
   }
 ];
 
-export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onViewAllReviews, isFavorited, onToggleFavorite }: RestaurantDetailProps) {
+export function RestaurantDetail({ onToggleFavorite, favorites }: RestaurantDetailProps) {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedReviewFilter, setSelectedReviewFilter] = useState('전체');
+
+  // URL 파라미터로 받은 id로 식당 정보 찾기
+  const restaurant = mockRestaurants.find(r => r.id === id);
+
+  useEffect(() => {
+    if (!restaurant) {
+      // 식당을 찾을 수 없으면 홈으로 리다이렉트
+      navigate('/');
+    }
+  }, [restaurant, navigate]);
+
+  if (!restaurant) {
+    return <div>Loading...</div>;
+  }
+
+  const isFavorited = favorites.includes(restaurant.id);
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleReservationRequest = () => {
+    navigate(`/reservation/${restaurant.id}`);
+  };
+
+  const handleViewAllReviews = () => {
+    navigate(`/restaurant/${restaurant.id}/reviews`);
+  };
+
+  const handleToggleFavorite = () => {
+    onToggleFavorite(restaurant.id);
+  };
 
   const restaurantImages = [
     restaurant.image,
@@ -89,27 +135,27 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
       {/* Header with image - 높이 44px + 240px */}
       <div className="relative">
         <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 h-11">
-          <Button 
-            variant="secondary" 
-            size="icon" 
+          <Button
+            variant="secondary"
+            size="icon"
             className="bg-black/20 backdrop-blur-sm border-0"
-            onClick={onBack}
+            onClick={handleBack}
           >
             <ArrowLeft className="h-4 w-4 text-white" />
           </Button>
           <div className="flex space-x-2">
-            <Button 
-              variant="secondary" 
-              size="icon" 
+            <Button
+              variant="secondary"
+              size="icon"
               className="bg-black/20 backdrop-blur-sm border-0"
             >
               <Share className="h-4 w-4 text-white" />
             </Button>
-            <Button 
-              variant="secondary" 
-              size="icon" 
+            <Button
+              variant="secondary"
+              size="icon"
               className="bg-black/20 backdrop-blur-sm border-0"
-              onClick={onToggleFavorite}
+              onClick={handleToggleFavorite}
             >
               <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-white'}`} />
             </Button>
@@ -118,7 +164,7 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
 
         {/* Image slider - 높이 240px */}
         <div className="relative h-60 bg-muted">
-          <ImageWithFallback 
+          <ImageWithFallback
             src={restaurantImages[currentImageIndex]}
             alt={restaurant.name}
             className="w-full h-full object-cover"
@@ -127,9 +173,8 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
             {restaurantImages.map((_, index) => (
               <button
                 key={index}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                }`}
+                className={`w-2 h-2 rounded-full transition-colors ${index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                  }`}
                 onClick={() => setCurrentImageIndex(index)}
               />
             ))}
@@ -169,9 +214,9 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
               <Phone className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">{restaurant.phone}</span>
               {/* 전화 버튼 - 터치 영역 44px */}
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="ml-auto h-11 px-4"
                 onClick={() => window.open(`tel:${restaurant.phone}`)}
               >
@@ -184,9 +229,9 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
 
         {/* 예약하기 CTA - 높이 56px, margin 16px, border-radius 12px, 배경 #2196F3 */}
         <div className="px-4 mb-4">
-          <Button 
+          <Button
             className="w-full h-14 bg-[#2196F3] hover:bg-[#1976D2] text-white rounded-xl text-base font-medium"
-            onClick={onReservationRequest}
+            onClick={handleReservationRequest}
           >
             예약하기
           </Button>
@@ -239,7 +284,7 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
                   </Badge>
                 ))}
               </div>
-              
+
               <div className="space-y-3">
                 {mockMenuItems.map((item, index) => (
                   <Card key={index} className="p-4">
@@ -272,7 +317,7 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
                       <p className="text-sm text-muted-foreground">📍 지도 보기</p>
                     </div>
                   </div>
-                  
+
                   {/* 하단 정보 영역 */}
                   <div className="space-y-2">
                     <p><strong>주소:</strong> {restaurant.location}</p>
@@ -298,7 +343,7 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
                   {/* 필터 탭 */}
                   <div className="flex space-x-2">
                     {['전체', '맛', '서비스', '분위기'].map((filter) => (
-                      <Badge 
+                      <Badge
                         key={filter}
                         variant={selectedReviewFilter === filter ? "default" : "outline"}
                         className="cursor-pointer"
@@ -309,7 +354,7 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
                     ))}
                   </div>
                 </div>
-                
+
                 {displayedReviews.map((review) => (
                   <Card key={review.id} className="p-4 animate-in fade-in duration-300">
                     {/* 리뷰 아이템 - 최소 높이 80px */}
@@ -327,21 +372,20 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`h-3 w-3 ${
-                                  i < review.rating
+                                className={`h-3 w-3 ${i < review.rating
                                     ? 'fill-yellow-400 text-yellow-400'
                                     : 'text-muted-foreground'
-                                }`}
+                                  }`}
                               />
                             ))}
                           </div>
                         </div>
                         <span className="text-sm text-muted-foreground">{review.date}</span>
                       </div>
-                      
+
                       {/* 텍스트 - 최대 3줄 표시 */}
                       <p className="text-sm leading-relaxed line-clamp-3">{review.content}</p>
-                      
+
                       {/* 이미지 - 64px × 64px 썸네일 */}
                       {review.images.length > 0 && (
                         <div className="flex space-x-2 overflow-x-auto">
@@ -355,7 +399,7 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
                           ))}
                         </div>
                       )}
-                      
+
                       <div className="flex items-center justify-between">
                         <Button variant="ghost" size="sm" className="text-muted-foreground">
                           👍 도움됨 {review.helpful}
@@ -364,12 +408,12 @@ export function RestaurantDetail({ restaurant, onBack, onReservationRequest, onV
                     </div>
                   </Card>
                 ))}
-                
+
                 {/* 더 많은 리뷰 보기 - 높이 44px */}
-                <Button 
-                  variant="outline" 
-                  className="w-full h-11" 
-                  onClick={onViewAllReviews}
+                <Button
+                  variant="outline"
+                  className="w-full h-11"
+                  onClick={handleViewAllReviews}
                 >
                   더 많은 리뷰 보기
                 </Button>

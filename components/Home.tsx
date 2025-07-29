@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
@@ -17,13 +18,6 @@ interface Restaurant {
   phone: string;
   image: string;
   description: string;
-}
-
-interface HomeProps {
-  onAIRecommendClick: () => void;
-  onRestaurantClick: (restaurant: Restaurant) => void;
-  onSearchClick: () => void;
-  onNotificationClick: () => void;
 }
 
 const recentRestaurants: Restaurant[] = [
@@ -104,7 +98,25 @@ const popularRestaurants: Restaurant[] = [
   }
 ];
 
-export function Home({ onAIRecommendClick, onRestaurantClick, onSearchClick, onNotificationClick }: HomeProps) {
+export function Home() {
+  const navigate = useNavigate();
+
+  const handleAIRecommendClick = () => {
+    navigate('/chat');
+  };
+
+  const handleRestaurantClick = (restaurant: Restaurant) => {
+    navigate(`/restaurant/${restaurant.id}`);
+  };
+
+  const handleSearchClick = () => {
+    navigate('/search');
+  };
+
+  const handleNotificationClick = () => {
+    navigate('/notifications');
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -112,7 +124,7 @@ export function Home({ onAIRecommendClick, onRestaurantClick, onSearchClick, onN
         <div className="flex items-center space-x-2">
           <h1 className="text-xl font-medium">WellMeet</h1>
         </div>
-        <Button variant="ghost" size="icon" className="relative" onClick={onNotificationClick}>
+        <Button variant="ghost" size="icon" className="relative" onClick={handleNotificationClick}>
           <Bell className="h-5 w-5" />
           <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
             2
@@ -126,10 +138,10 @@ export function Home({ onAIRecommendClick, onRestaurantClick, onSearchClick, onN
           {/* Search Bar */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="맛집, 지역, 음식 검색..." 
+            <Input
+              placeholder="맛집, 지역, 음식 검색..."
               className="pl-10 h-12 bg-input-background border-0 cursor-pointer"
-              onClick={onSearchClick}
+              onClick={handleSearchClick}
               readOnly
             />
           </div>
@@ -141,8 +153,8 @@ export function Home({ onAIRecommendClick, onRestaurantClick, onSearchClick, onN
               <p className="text-sm text-muted-foreground">
                 "내일 여자친구와 기념일 데이트하는데 분위기 좋은 곳 추천해줘"
               </p>
-              <Button 
-                onClick={onAIRecommendClick}
+              <Button
+                onClick={handleAIRecommendClick}
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700"
               >
                 AI에게 맛집 추천 받기
@@ -158,10 +170,10 @@ export function Home({ onAIRecommendClick, onRestaurantClick, onSearchClick, onN
             </div>
             <div className="flex space-x-3 overflow-x-auto pb-2">
               {recentRestaurants.map((restaurant) => (
-                <Card 
+                <Card
                   key={restaurant.id}
                   className="flex-shrink-0 w-72 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => onRestaurantClick(restaurant)}
+                  onClick={() => handleRestaurantClick(restaurant)}
                 >
                   <div className="p-3">
                     <div className="flex space-x-3">
@@ -198,10 +210,10 @@ export function Home({ onAIRecommendClick, onRestaurantClick, onSearchClick, onN
             </div>
             <div className="space-y-3">
               {popularRestaurants.map((restaurant) => (
-                <Card 
+                <Card
                   key={restaurant.id}
                   className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => onRestaurantClick(restaurant)}
+                  onClick={() => handleRestaurantClick(restaurant)}
                 >
                   <div className="p-4">
                     <div className="flex space-x-4">
