@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
@@ -8,7 +7,6 @@ import {
   ArrowLeft,
   Edit2,
   Bell,
-  User,
   Crown,
   CreditCard,
   Phone,
@@ -22,18 +20,10 @@ import {
   Calendar,
   ChevronRight
 } from 'lucide-react';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  tier: 'standard' | 'premium' | 'vip';
-}
+import type { User } from '../src/types/api';
 
 interface ProfilePageProps {
   user: User;
-  onUserUpdate: (updatedUser: User) => void;
 }
 
 const getTierInfo = (tier: User['tier']) => {
@@ -69,7 +59,7 @@ const mockStats = {
   averageRating: 4.6
 };
 
-export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
+export function ProfilePage({ user }: ProfilePageProps) {
   const navigate = useNavigate();
   const tierInfo = getTierInfo(user.tier);
 
@@ -89,7 +79,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
       onClick: () => { }
     },
     {
-      icon: User,
+      icon: Edit2,
       label: '개인정보 수정',
       description: '이름, 연락처, 프로필 사진',
       onClick: handleUserEdit

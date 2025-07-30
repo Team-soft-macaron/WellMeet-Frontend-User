@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from './components/Home';
 import { ChatPage } from './components/ChatPage';
@@ -14,7 +14,31 @@ import { NotificationPage } from './components/NotificationPage';
 import { BottomNavigation } from './components/BottomNavigation';
 import { userApi, notificationApi, favoriteApi } from './src/utils/api';
 import { useApi } from './src/hooks/useApi';
-import type { User, Notification } from './src/types/api';
+import type { User, Restaurant, Notification } from './src/types/api';
+
+// Mock data
+const mockRestaurants: Restaurant[] = [
+  {
+    id: '1',
+    name: '라비올로',
+    address: '강남구 논현동',
+    distance: '0m',
+    rating: 4.8,
+    thumbnail: '',
+    category: '이탈리안',
+    priceRange: '20-30만원',
+    reviewCount: 124,
+    phone: '02-1234-5678',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
+    description: '로맨틱한 분위기의 이탈리안 레스토랑',
+    operatingHours: {
+      weekday: '11:00 - 22:00',
+      weekend: '11:00 - 23:00',
+      closedDay: '월요일'
+    },
+    features: ['와인', '데이트', '로맨틱']
+  }
+];
 
 // Fallback mock data for when API is not available
 const fallbackUser: User = {
@@ -124,7 +148,7 @@ export default function App() {
     alert('예약이 성공적으로 수정되었습니다!');
   };
 
-  const handleNotificationAction = async (notification: Notification, action: string) => {
+  const handleNotificationAction = async (notification: Notification) => {
     try {
       if (!notification.isRead) {
         await notificationApi.markAsRead(notification.id);
@@ -166,11 +190,14 @@ export default function App() {
                 favorites={favorites}
               />
             } />
-            <Route path="/restaurant/:id/reviews" element={<AllReviewsPage />} />
+            <Route path="/restaurant/:id/reviews" element={<AllReviewsPage restaurant={mockRestaurants[0]} onBack={() => window.history.back()} />} />
             <Route path="/reservation/:id" element={
               <ReservationPage
                 user={user}
-                onUserUpdate={handleUserUpdate}
+                restaurant={mockRestaurants[0]}
+                onBack={() => window.history.back()}
+                onComplete={() => { }}
+                onUserEdit={() => { }}
               />
             } />
             <Route path="/reservation" element={<BookingList />} />
@@ -187,7 +214,6 @@ export default function App() {
             <Route path="/profile" element={
               <ProfilePage
                 user={user}
-                onUserUpdate={handleUserUpdate}
               />
             } />
             <Route path="/profile/edit" element={

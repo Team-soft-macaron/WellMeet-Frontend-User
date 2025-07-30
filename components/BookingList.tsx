@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { ArrowLeft, Calendar, Users, CreditCard, MoreVertical, Star } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, CreditCard } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { bookingApi } from '../src/utils/api';
 import { useApi } from '../src/hooks/useApi';
@@ -133,10 +133,6 @@ export function BookingList() {
     navigate(`/reservation/${booking.id}`);
   };
 
-  const handleBookingEdit = (booking: Booking) => {
-    navigate(`/reservation/${booking.id}/edit`);
-  };
-
   const renderBookingCard = (booking: Booking) => {
     const statusInfo = getStatusInfo(booking.status);
 
@@ -152,7 +148,6 @@ export function BookingList() {
               src={booking.restaurantImage}
               alt={booking.restaurantName}
               className="w-20 h-20 rounded-lg object-cover"
-              fallbackSrc="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=80&h=80&fit=crop"
             />
           </div>
           <div className="flex-1 min-w-0">

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -6,7 +5,6 @@ import {
   Home,
   MessageCircle,
   Calendar,
-  Heart,
   User,
   Bell
 } from 'lucide-react';

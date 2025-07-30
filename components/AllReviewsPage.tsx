@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -21,16 +21,16 @@ import {
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface Restaurant {
-  id: string;
-  name: string;
-  category: string;
-  priceRange: string;
-  rating: number;
-  reviewCount: number;
-  location: string;
-  phone: string;
-  image: string;
-  description: string;
+  id?: string;
+  name?: string;
+  category?: string;
+  priceRange?: string;
+  rating?: number;
+  reviewCount?: number;
+  address?: string;
+  phone?: string | undefined;
+  image?: string | undefined;
+  description?: string;
 }
 
 interface Review {
@@ -300,12 +300,12 @@ export function AllReviewsPage({
       prev.map((review) =>
         review.id === reviewId
           ? {
-              ...review,
-              helpful: review.isHelpful
-                ? review.helpful - 1
-                : review.helpful + 1,
-              isHelpful: !review.isHelpful,
-            }
+            ...review,
+            helpful: review.isHelpful
+              ? review.helpful - 1
+              : review.helpful + 1,
+            isHelpful: !review.isHelpful,
+          }
           : review,
       ),
     );
@@ -363,7 +363,7 @@ export function AllReviewsPage({
                 {[5, 4, 3, 2, 1].map((rating) => {
                   const count =
                     ratingDistribution[
-                      rating as keyof typeof ratingDistribution
+                    rating as keyof typeof ratingDistribution
                     ];
                   const percentage =
                     totalReviews > 0
@@ -476,11 +476,10 @@ export function AllReviewsPage({
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-3 w-3 ${
-                                i < review.rating
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-muted-foreground"
-                              }`}
+                              className={`h-3 w-3 ${i < review.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-muted-foreground"
+                                }`}
                             />
                           ))}
                         </div>
