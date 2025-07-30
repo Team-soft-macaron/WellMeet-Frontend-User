@@ -117,7 +117,7 @@ export function BookingEdit({ onBookingUpdate }: BookingEditProps) {
     return (
       <div className="flex flex-col h-full bg-background">
         <div className="flex items-center p-4 border-b border-border">
-          <Button variant="ghost" size="icon" className="mr-3" onClick={() => navigate('/bookings')}>
+          <Button variant="ghost" size="icon" className="mr-3" onClick={() => navigate('/reservation')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-medium">예약 수정</h1>
@@ -139,7 +139,7 @@ export function BookingEdit({ onBookingUpdate }: BookingEditProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleBack = () => {
-    navigate('/bookings');
+    navigate('/reservation');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -150,7 +150,7 @@ export function BookingEdit({ onBookingUpdate }: BookingEditProps) {
     setTimeout(() => {
       onBookingUpdate(formData);
       setIsLoading(false);
-      navigate(`/bookings/${booking.id}`);
+      navigate(`/reservation/${booking.id}`);
     }, 1500);
   };
 

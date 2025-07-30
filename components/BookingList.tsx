@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
@@ -6,24 +6,12 @@ import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ArrowLeft, Calendar, Users, CreditCard, MoreVertical, Star } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { bookingApi } from '../src/utils/api';
+import { useApi } from '../src/hooks/useApi';
+import type { Booking } from '../src/types/api';
 
-interface Booking {
-  id: string;
-  restaurantName: string;
-  restaurantImage: string;
-  date: string;
-  time: string;
-  partySize: number;
-  estimatedCost: string;
-  status: 'confirmed' | 'pending' | 'completed' | 'cancelled';
-  specialRequests?: string;
-  location: string;
-  phone?: string;
-  confirmationNumber?: string;
-  bookedAt?: string;
-}
-
-const mockBookings: Booking[] = [
+// Fallback mock data for when API is not available
+const fallbackBookings: Booking[] = [
   {
     id: '1',
     restaurantName: '라비올로',
@@ -72,37 +60,37 @@ const mockBookings: Booking[] = [
 const getStatusInfo = (status: Booking['status']) => {
   switch (status) {
     case 'confirmed':
-      return { 
-        label: '확정', 
-        color: 'bg-green-500', 
+      return {
+        label: '확정',
+        color: 'bg-green-500',
         textColor: 'text-green-700',
         bgColor: 'bg-green-50 border-green-200'
       };
     case 'pending':
-      return { 
-        label: '대기', 
-        color: 'bg-yellow-500', 
+      return {
+        label: '대기',
+        color: 'bg-yellow-500',
         textColor: 'text-yellow-700',
         bgColor: 'bg-yellow-50 border-yellow-200'
       };
     case 'completed':
-      return { 
-        label: '완료', 
-        color: 'bg-gray-500', 
+      return {
+        label: '완료',
+        color: 'bg-gray-500',
         textColor: 'text-gray-700',
         bgColor: 'bg-gray-50 border-gray-200'
       };
     case 'cancelled':
-      return { 
-        label: '취소', 
-        color: 'bg-red-500', 
+      return {
+        label: '취소',
+        color: 'bg-red-500',
         textColor: 'text-red-700',
         bgColor: 'bg-red-50 border-red-200'
       };
     default:
-      return { 
-        label: '알 수 없음', 
-        color: 'bg-gray-500', 
+      return {
+        label: '알 수 없음',
+        color: 'bg-gray-500',
         textColor: 'text-gray-700',
         bgColor: 'bg-gray-50 border-gray-200'
       };
@@ -112,154 +100,96 @@ const getStatusInfo = (status: Booking['status']) => {
 export function BookingList() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const upcomingBookings = mockBookings.filter(b => 
-    b.status === 'confirmed' || b.status === 'pending'
-  );
-  const pastBookings = mockBookings.filter(b => 
-    b.status === 'completed' || b.status === 'cancelled'
-  );
+  // Use custom hook for API calls
+  const { execute: fetchBookings } = useApi(bookingApi.getBookings, {
+    onSuccess: (data) => {
+      setBookings(data);
+      setLoading(false);
+    },
+    onError: (error) => {
+      console.error('Error fetching bookings:', error);
+      setError('Failed to load bookings');
+      // Use fallback data when API fails
+      setBookings(fallbackBookings);
+      setLoading(false);
+    }
+  });
+
+  // Fetch bookings only once on mount
+  useEffect(() => {
+    setLoading(true);
+    fetchBookings();
+  }, []); // Empty dependency array to prevent infinite loops
 
   const handleBack = () => {
-    navigate('/');
+    navigate(-1);
   };
 
   const handleBookingSelect = (booking: Booking) => {
-    navigate(`/bookings/${booking.id}`);
+    navigate(`/reservation/${booking.id}`);
   };
 
   const handleBookingEdit = (booking: Booking) => {
-    navigate(`/bookings/${booking.id}/edit`);
+    navigate(`/reservation/${booking.id}/edit`);
   };
 
   const renderBookingCard = (booking: Booking) => {
     const statusInfo = getStatusInfo(booking.status);
-    
-    return (
-      <Card key={booking.id} className={`p-4 ${statusInfo.bgColor}`}>
-        <div className="space-y-3">
-          {/* Header with status */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full ${statusInfo.color}`}></div>
-              <span className={`font-medium ${statusInfo.textColor}`}>
-                {statusInfo.label}
-              </span>
-              <span className="font-medium">{booking.restaurantName}</span>
-            </div>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </div>
 
-          {/* Restaurant info */}
-          <div className="flex space-x-3">
+    return (
+      <Card
+        key={booking.id}
+        className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+        onClick={() => handleBookingSelect(booking)}
+      >
+        <div className="flex space-x-4">
+          <div className="flex-shrink-0">
             <ImageWithFallback
               src={booking.restaurantImage}
               alt={booking.restaurantName}
-              className="w-16 h-16 rounded-lg object-cover"
+              className="w-20 h-20 rounded-lg object-cover"
+              fallbackSrc="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=80&h=80&fit=crop"
             />
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center space-x-4 text-sm">
-                <div className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>{booking.date} {booking.time}</span>
-                </div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between mb-2">
+              <h3 className="font-semibold text-lg truncate">{booking.restaurantName}</h3>
+              <Badge
+                variant="outline"
+                className={`${statusInfo.bgColor} ${statusInfo.textColor} border-current`}
+              >
+                {statusInfo.label}
+              </Badge>
+            </div>
+
+            <div className="space-y-1 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-2">
+                <Calendar className="h-4 w-4" />
+                <span>{booking.date} {booking.time}</span>
               </div>
-              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-1">
-                  <Users className="h-4 w-4" />
-                  <span>{booking.partySize}명</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <CreditCard className="h-4 w-4" />
-                  <span>{booking.estimatedCost}</span>
-                </div>
+              <div className="flex items-center space-x-2">
+                <Users className="h-4 w-4" />
+                <span>{booking.partySize}명</span>
               </div>
-              {booking.specialRequests && (
-                <p className="text-sm text-muted-foreground">
-                  "{booking.specialRequests}"
-                </p>
+              <div className="flex items-center space-x-2">
+                <CreditCard className="h-4 w-4" />
+                <span>{booking.estimatedCost}</span>
+              </div>
+              {booking.confirmationNumber && (
+                <div className="text-xs">
+                  예약번호: {booking.confirmationNumber}
+                </div>
               )}
             </div>
-          </div>
 
-          {/* Action buttons */}
-          <div className="flex space-x-2 pt-2">
-            {booking.status === 'confirmed' || booking.status === 'pending' ? (
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1"
-                  onClick={() => handleBookingSelect(booking)}
-                >
-                  상세보기
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1"
-                  onClick={() => handleBookingEdit(booking)}
-                >
-                  수정
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-red-600 hover:text-red-700"
-                  onClick={() => confirm(`${booking.restaurantName} 예약을 취소하시겠습니까?`)}
-                >
-                  취소
-                </Button>
-              </>
-            ) : booking.status === 'completed' ? (
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1"
-                  onClick={() => handleBookingSelect(booking)}
-                >
-                  상세보기
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1"
-                  onClick={() => alert(`${booking.restaurantName} 재예약을 진행합니다.`)}
-                >
-                  재예약
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center"
-                  onClick={() => alert(`${booking.restaurantName} 리뷰 작성 페이지로 이동합니다.`)}
-                >
-                  <Star className="h-3 w-3 mr-1" />
-                  리뷰 작성
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1"
-                  onClick={() => alert(`${booking.restaurantName} 재예약을 진행합니다.`)}
-                >
-                  재예약하기
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-red-600"
-                  onClick={() => confirm(`${booking.restaurantName} 예약 기록을 삭제하시겠습니까?`)}
-                >
-                  삭제
-                </Button>
-              </>
+            {booking.specialRequests && (
+              <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
+                <span className="font-medium">특별 요청:</span> {booking.specialRequests}
+              </div>
             )}
           </div>
         </div>
@@ -267,98 +197,86 @@ export function BookingList() {
     );
   };
 
+  const upcomingBookings = bookings.filter(booking =>
+    booking.status === 'confirmed' || booking.status === 'pending'
+  );
+
+  const pastBookings = bookings.filter(booking =>
+    booking.status === 'completed' || booking.status === 'cancelled'
+  );
+
+  if (loading) {
+    return (
+      <div className="flex-1 overflow-y-auto bg-background">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading bookings...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex-1 overflow-y-auto bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <div className="flex items-center">
-          <Button variant="ghost" size="icon" className="mr-3" onClick={handleBack}>
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+        <div className="flex items-center justify-between p-4">
+          <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-medium">내 예약</h1>
+          <h1 className="text-lg font-semibold">예약 내역</h1>
+          <div className="w-10" /> {/* Spacer for centering */}
         </div>
-        <Button variant="ghost" size="sm">
-          필터 ⚙️
-        </Button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <div className="px-4 pt-4 pb-2">
-            <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="upcoming">진행중</TabsTrigger>
-            <TabsTrigger value="past">완료</TabsTrigger>
-            <TabsTrigger value="cancelled">취소</TabsTrigger>
+      <div className="p-4">
+        {error && (
+          <div className="text-center py-4 text-red-500 mb-4">
+            {error}
+          </div>
+        )}
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="upcoming">
+              예정 ({upcomingBookings.length})
+            </TabsTrigger>
+            <TabsTrigger value="past">
+              완료 ({pastBookings.length})
+            </TabsTrigger>
           </TabsList>
-          </div>
 
-          <div className="flex-1 overflow-y-auto">
-            <TabsContent value="upcoming" className="p-4 pb-10 space-y-4 mt-4 h-full">
-            {upcomingBookings.length > 0 ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <h2 className="font-medium">예정된 예약</h2>
-                  <Badge variant="secondary">{upcomingBookings.length}건</Badge>
-                </div>
-                <div className="space-y-3">
-                  {upcomingBookings.map(renderBookingCard)}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">예정된 예약이 없습니다</p>
-                <Button className="mt-4">새 예약 만들기</Button>
+          <TabsContent value="upcoming" className="space-y-4 mt-4">
+            {upcomingBookings.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                <p>예정된 예약이 없습니다</p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => navigate('/')}
+                >
+                  맛집 찾기
+                </Button>
               </div>
+            ) : (
+              upcomingBookings.map(renderBookingCard)
             )}
           </TabsContent>
 
-            <TabsContent value="past" className="p-4 pb-10 space-y-4 mt-4 h-full">
-            {pastBookings.filter(b => b.status === 'completed').length > 0 ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <h2 className="font-medium">지난 예약</h2>
-                  <Badge variant="secondary">
-                    {pastBookings.filter(b => b.status === 'completed').length}건
-                  </Badge>
-                </div>
-                <div className="space-y-3">
-                  {pastBookings
-                    .filter(b => b.status === 'completed')
-                    .map(renderBookingCard)}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <Star className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">완료된 예약이 없습니다</p>
+          <TabsContent value="past" className="space-y-4 mt-4">
+            {pastBookings.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                <p>완료된 예약이 없습니다</p>
               </div>
+            ) : (
+              pastBookings.map(renderBookingCard)
             )}
           </TabsContent>
-
-            <TabsContent value="cancelled" className="p-4 pb-10 space-y-4 mt-4 h-full">
-            {pastBookings.filter(b => b.status === 'cancelled').length > 0 ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <h2 className="font-medium">취소된 예약</h2>
-                  <Badge variant="secondary">
-                    {pastBookings.filter(b => b.status === 'cancelled').length}건
-                  </Badge>
-                </div>
-                <div className="space-y-3">
-                  {pastBookings
-                    .filter(b => b.status === 'cancelled')
-                    .map(renderBookingCard)}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">취소된 예약이 없습니다</p>
-              </div>
-            )}
-          </TabsContent>
-          </div>
         </Tabs>
       </div>
     </div>

@@ -35,11 +35,11 @@ export function BottomNavigation({ notificationCount = 0 }: BottomNavigationProp
       onClick: () => navigate('/chat')
     },
     {
-      id: 'bookings',
+      id: 'reservation',
       label: '예약',
       icon: Calendar,
-      path: '/bookings',
-      onClick: () => navigate('/bookings')
+      path: '/reservation',
+      onClick: () => navigate('/reservation')
     },
     {
       id: 'notifications',
@@ -59,7 +59,7 @@ export function BottomNavigation({ notificationCount = 0 }: BottomNavigationProp
   ];
 
   // Only show bottom nav on main pages
-  const showOnPages = ['/', '/chat', '/bookings', '/notifications', '/profile'];
+  const showOnPages = ['/', '/chat', '/reservation', '/notifications', '/profile'];
 
   if (!showOnPages.includes(location.pathname)) {
     return null;

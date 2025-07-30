@@ -14,9 +14,19 @@ export default defineConfig({
         port: 3000,
         open: true,
         proxy: {
+            // 추천 API는 다른 서버로
             '/api/restaurants/recommend': {
                 target: 'http://recommendation-alb-1698888954.ap-northeast-2.elb.amazonaws.com',
                 changeOrigin: true,
+                secure: false,
+                rewrite: (path) => path.replace(/^\/api/, '/api'),
+            },
+            // 나머지 API는 기존 서버로
+            '/api': {
+                target: 'http://wellmeet-alb-1955693121.ap-northeast-2.elb.amazonaws.com',
+                changeOrigin: true,
+                secure: false,
+                rewrite: (path) => path.replace(/^\/api/, '/api'),
             },
         },
     },
@@ -24,4 +34,4 @@ export default defineConfig({
         outDir: 'dist',
         sourcemap: true,
     },
-}) 
+})

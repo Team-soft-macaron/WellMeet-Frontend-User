@@ -80,7 +80,7 @@ export function ChatPage() {
 
     try {
       // Call API
-      const response = await fetch('/api/restaurants/recommend', {
+      const response = await fetch('/api/restaurant/recommend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

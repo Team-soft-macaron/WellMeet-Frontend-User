@@ -123,7 +123,7 @@ export function BookingDetail({ onBookingUpdate }: BookingDetailProps) {
     return (
       <div className="flex flex-col h-full bg-background">
         <div className="flex items-center p-4 border-b border-border">
-          <Button variant="ghost" size="icon" className="mr-3" onClick={() => navigate('/bookings')}>
+          <Button variant="ghost" size="icon" className="mr-3" onClick={() => navigate('/reservation')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-medium">예약 상세정보</h1>
@@ -138,17 +138,17 @@ export function BookingDetail({ onBookingUpdate }: BookingDetailProps) {
   const statusInfo = getStatusInfo(booking.status);
 
   const handleBack = () => {
-    navigate('/bookings');
+    navigate('/reservation');
   };
 
   const handleModify = () => {
-    navigate(`/bookings/${booking.id}/edit`);
+    navigate(`/reservation/${booking.id}/edit`);
   };
 
   const handleCancel = () => {
     if (confirm(`${booking.restaurantName} 예약을 취소하시겠습니까?`)) {
       onBookingUpdate({ status: 'cancelled' });
-      navigate('/bookings');
+      navigate('/reservation');
     }
   };
 
