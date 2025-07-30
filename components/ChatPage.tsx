@@ -11,8 +11,7 @@ interface Message {
   id: string;
   sender: 'user' | 'ai';
   content: string;
-  type: 'text' | 'options' | 'recommendations';
-  options?: string[];
+  type: 'text' | 'recommendations';
   recommendations?: Restaurant[];
   timestamp: Date;
 }
@@ -20,58 +19,13 @@ interface Message {
 interface Restaurant {
   id: string;
   name: string;
-  category: string;
-  priceRange: string;
+  address: string;
   rating: number;
   reviewCount: number;
-  location: string;
-  phone: string;
-  image: string;
-  description: string;
-  reason: string;
+  latitude: number;
+  longitude: number;
+  thumbnail: string;
 }
-
-const mockRecommendations: Restaurant[] = [
-  {
-    id: '1',
-    name: '라비올로',
-    category: '이탈리안',
-    priceRange: '15-20만원',
-    rating: 4.5,
-    reviewCount: 124,
-    location: '강남구 논현동',
-    phone: '02-1234-5678',
-    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
-    description: '로맨틱한 분위기의 이탈리안 레스토랑',
-    reason: '데이트에 완벽한 로맨틱한 분위기로 유명해요'
-  },
-  {
-    id: '2',
-    name: '스시 오마카세',
-    category: '일식',
-    priceRange: '18-25만원',
-    rating: 4.7,
-    reviewCount: 89,
-    location: '청담동',
-    phone: '02-2345-6789',
-    image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop',
-    description: '프라이빗한 공간에서 즐기는 오마카세',
-    reason: '프라이빗한 공간에서 특별한 경험을 할 수 있어요'
-  },
-  {
-    id: '3',
-    name: '더 키친',
-    category: '프렌치',
-    priceRange: '16-22만원',
-    rating: 4.6,
-    reviewCount: 156,
-    location: '청담동',
-    phone: '02-3456-7890',
-    image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop',
-    description: '특별한 날을 위한 프렌치 레스토랑',
-    reason: '특별한 날에 어울리는 고급스러운 분위기예요'
-  }
-];
 
 export function ChatPage() {
   const navigate = useNavigate();
@@ -79,14 +33,13 @@ export function ChatPage() {
     {
       id: '1',
       sender: 'ai',
-      content: '안녕하세요! 어떤 상황에서 드실 건가요? 자세히 설명해주시면 완벽한 맛집을 추천해드릴게요 😊',
+      content: '안녕하세요! 어떤 맛집을 찾고 계신가요? 자유롭게 말씀해주세요 😊',
       type: 'text',
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [conversationState, setConversationState] = useState<'initial' | 'asking_people' | 'asking_budget' | 'complete'>('initial');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -125,61 +78,67 @@ export function ChatPage() {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response delay
-    setTimeout(() => {
-      let aiResponse: Message;
+    try {
+      // Call API
+      const response = await fetch('/api/restaurants/recommend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: content.trim()
+        })
+      });
 
-      if (conversationState === 'initial') {
-        // First response - ask for details
-        aiResponse = {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          content: '몇 명이서 가시나요?',
-          type: 'options',
-          options: ['2명', '3명', '4명', '5명 이상'],
-          timestamp: new Date()
-        };
-        setConversationState('asking_people');
-      } else if (conversationState === 'asking_people') {
-        // Second response - ask for budget
-        aiResponse = {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          content: '예산은 어느 정도 생각하고 계세요?',
-          type: 'options',
-          options: ['8-12만원', '12-20만원', '20-30만원', '30만원 이상'],
-          timestamp: new Date()
-        };
-        setConversationState('asking_budget');
-      } else if (conversationState === 'asking_budget') {
-        // Final response - provide recommendations
-        aiResponse = {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          content: '데이트에 완벽한 3곳을 추천드려요! 🎉',
-          type: 'recommendations',
-          recommendations: mockRecommendations,
-          timestamp: new Date()
-        };
-        setConversationState('complete');
+      if (response.ok) {
+        const data = await response.json();
+
+        let aiResponse: Message;
+
+        if (data && data.length > 0) {
+          aiResponse = {
+            id: (Date.now() + 1).toString(),
+            sender: 'ai',
+            content: `"${content.trim()}"에 대한 추천 식당 ${data.length}곳을 찾았어요! 🎉`,
+            type: 'recommendations',
+            recommendations: data,
+            timestamp: new Date()
+          };
+        } else {
+          aiResponse = {
+            id: (Date.now() + 1).toString(),
+            sender: 'ai',
+            content: '죄송해요. 해당 조건에 맞는 식당을 찾지 못했어요. 다른 키워드로 다시 검색해보세요! 😅',
+            type: 'text',
+            timestamp: new Date()
+          };
+        }
+
+        setMessages(prev => [...prev, aiResponse]);
       } else {
-        // Already complete - provide additional help
-        aiResponse = {
+        // API error
+        const aiResponse: Message = {
           id: (Date.now() + 1).toString(),
           sender: 'ai',
-          content: '다른 상황이나 조건으로 추천받고 싶으시면 말씀해주세요! 😊',
+          content: '죄송해요. 추천 서비스에 일시적인 문제가 있어요. 잠시 후 다시 시도해주세요! 😅',
           type: 'text',
           timestamp: new Date()
         };
+        setMessages(prev => [...prev, aiResponse]);
       }
-
-      setIsTyping(false);
+    } catch (error) {
+      // Network error
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        content: '네트워크 연결에 문제가 있어요. 인터넷 연결을 확인하고 다시 시도해주세요! 😅',
+        type: 'text',
+        timestamp: new Date()
+      };
       setMessages(prev => [...prev, aiResponse]);
-    }, 1500);
-  };
+    }
 
-  const handleOptionSelect = (option: string) => {
-    handleSendMessage(option);
+    setIsTyping(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -209,28 +168,11 @@ export function ChatPage() {
             <div className={`max-w-[85%] ${message.sender === 'user' ? 'order-1' : 'order-0'}`}>
               <div
                 className={`rounded-2xl px-4 py-3 ${message.sender === 'user'
-                    ? 'bg-blue-600 text-white rounded-tr-md'
-                    : 'bg-muted rounded-tl-md'
+                  ? 'bg-blue-600 text-white rounded-tr-md'
+                  : 'bg-muted rounded-tl-md'
                   }`}
               >
                 <p className="text-sm leading-relaxed">{message.content}</p>
-
-                {/* Options */}
-                {message.type === 'options' && message.options && (
-                  <div className="mt-3 space-y-2">
-                    {message.options.map((option, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        size="sm"
-                        className="mr-2 mb-2 h-9 bg-background"
-                        onClick={() => handleOptionSelect(option)}
-                      >
-                        {option}
-                      </Button>
-                    ))}
-                  </div>
-                )}
 
                 {/* Recommendations */}
                 {message.type === 'recommendations' && message.recommendations && (
@@ -250,35 +192,34 @@ export function ChatPage() {
                               <h4 className="font-medium text-foreground">{restaurant.name}</h4>
                               <div className="flex items-center space-x-2 mt-1">
                                 <Badge variant="secondary" className="text-xs">
-                                  {restaurant.category}
+                                  일식
                                 </Badge>
-                                <span className="text-sm text-blue-600 font-medium">
-                                  {restaurant.priceRange}
-                                </span>
                               </div>
                             </div>
                           </div>
 
-                          <ImageWithFallback
-                            src={restaurant.image}
-                            alt={restaurant.name}
-                            className="w-full h-32 rounded-lg object-cover"
-                          />
+                          {restaurant.thumbnail && (
+                            <ImageWithFallback
+                              src={restaurant.thumbnail}
+                              alt={restaurant.name}
+                              className="w-full h-32 rounded-lg object-cover"
+                            />
+                          )}
 
                           <div className="space-y-2">
                             <div className="flex items-center space-x-4">
                               <div className="flex items-center space-x-1">
                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                <span className="text-sm font-medium">{restaurant.rating}</span>
-                                <span className="text-xs text-muted-foreground">({restaurant.reviewCount}개)</span>
+                                <span className="text-sm font-medium">{restaurant.rating || '평점 없음'}</span>
+                                {restaurant.reviewCount > 0 && (
+                                  <span className="text-xs text-muted-foreground">({restaurant.reviewCount}개)</span>
+                                )}
                               </div>
                               <div className="flex items-center space-x-1 text-sm text-muted-foreground">
                                 <MapPin className="h-4 w-4" />
-                                <span>{restaurant.location}</span>
+                                <span>{restaurant.address}</span>
                               </div>
                             </div>
-
-                            <p className="text-sm text-muted-foreground">{restaurant.reason}</p>
 
                             <div className="flex space-x-2 pt-2">
                               <Button

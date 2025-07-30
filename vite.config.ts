@@ -13,6 +13,12 @@ export default defineConfig({
     server: {
         port: 3000,
         open: true,
+        proxy: {
+            '/api/restaurants/recommend': {
+                target: 'http://recommendation-alb-1698888954.ap-northeast-2.elb.amazonaws.com',
+                changeOrigin: true,
+            },
+        },
     },
     build: {
         outDir: 'dist',

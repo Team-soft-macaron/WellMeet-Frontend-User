@@ -70,79 +70,79 @@ interface Notification {
 }
 
 // Mock data
-const mockBookings: Booking[] = [
-  {
-    id: '1',
-    restaurantName: '라비올로',
-    restaurantImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=200&fit=crop',
-    date: '7월 20일 (토)',
-    time: '19:00',
-    partySize: 2,
-    estimatedCost: '30만원',
-    status: 'confirmed',
-    specialRequests: '창가 자리로 부탁드려요',
-    location: '강남구 논현동',
-    phone: '02-1234-5678',
-    confirmationNumber: 'WM240720001',
-    bookedAt: '7월 18일 14:30'
-  }
-];
+  const mockBookings: Booking[] = [
+    {
+      id: '1',
+      restaurantName: '라비올로',
+      restaurantImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=200&fit=crop',
+      date: '7월 20일 (토)',
+      time: '19:00',
+      partySize: 2,
+      estimatedCost: '30만원',
+      status: 'confirmed',
+      specialRequests: '창가 자리로 부탁드려요',
+      location: '강남구 논현동',
+      phone: '02-1234-5678',
+      confirmationNumber: 'WM240720001',
+      bookedAt: '7월 18일 14:30'
+    }
+  ];
 
-const mockRestaurants: Restaurant[] = [
-  {
-    id: '1',
-    name: '라비올로',
-    category: '이탈리안',
-    priceRange: '20-30만원',
-    rating: 4.8,
-    reviewCount: 124,
-    location: '강남구 논현동',
-    phone: '02-1234-5678',
-    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=200&fit=crop',
-    description: '정통 이탈리안 레스토랑',
-    operatingHours: {
-      weekday: '11:30 - 22:00',
-      weekend: '11:30 - 22:30',
-      breakTime: '15:00 - 17:00',
-      closedDay: '매주 월요일'
-    },
-    features: ['발렛파킹', '프라이빗룸', '와인바']
-  }
-];
+  const mockRestaurants: Restaurant[] = [
+    {
+      id: '1',
+      name: '라비올로',
+      category: '이탈리안',
+      priceRange: '20-30만원',
+      rating: 4.8,
+      reviewCount: 124,
+      location: '강남구 논현동',
+      phone: '02-1234-5678',
+      image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=200&fit=crop',
+      description: '정통 이탈리안 레스토랑',
+      operatingHours: {
+        weekday: '11:30 - 22:00',
+        weekend: '11:30 - 22:30',
+        breakTime: '15:00 - 17:00',
+        closedDay: '매주 월요일'
+      },
+      features: ['발렛파킹', '프라이빗룸', '와인바']
+    }
+  ];
 
 const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'booking_confirmed',
-    title: '예약 확정',
-    message: '라비올로 예약이 확정됐어요',
-    detail: '내일 7:00 PM • 2명',
-    time: '2시간 전',
-    isRead: false,
-    bookingId: '1',
-    restaurantId: '1'
-  },
-  {
-    id: '2',
-    type: 'reminder',
-    title: '방문 리마인더',
-    message: '내일 라비올로 예약 확인',
-    detail: '1일 전',
-    time: '어제',
-    isRead: false,
-    bookingId: '1',
-    restaurantId: '1'
-  },
-  {
-    id: '3',
-    type: 'review_reply',
-    title: '리뷰 답글',
-    message: '라비올로 사장님이 답글 작성',
-    detail: '3일 전',
-    time: '이번 주',
-    isRead: true,
-    restaurantId: '1'
-  }
+    {
+      id: '1',
+      type: 'booking_confirmed',
+      title: '예약 확정',
+      message: '라비올로 예약이 확정됐어요',
+      detail: '내일 7:00 PM • 2명',
+      time: '2시간 전',
+      isRead: false,
+      bookingId: '1',
+      restaurantId: '1'
+    },
+    {
+      id: '2',
+      type: 'reminder',
+      title: '방문 리마인더',
+      message: '내일 라비올로 예약 확인',
+      detail: '1일 전',
+      time: '어제',
+      isRead: false,
+      bookingId: '1',
+      restaurantId: '1'
+    },
+    {
+      id: '3',
+      type: 'review_reply',
+      title: '리뷰 답글',
+      message: '라비올로 사장님이 답글 작성',
+      detail: '3일 전',
+      time: '이번 주',
+      isRead: true,
+      restaurantId: '1'
+    }
 ];
 
 export default function App() {
@@ -157,8 +157,8 @@ export default function App() {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
 
   const handleToggleFavorite = (restaurantId: string) => {
-    setFavorites(prev =>
-      prev.includes(restaurantId)
+    setFavorites(prev => 
+      prev.includes(restaurantId) 
         ? prev.filter(id => id !== restaurantId)
         : [...prev, restaurantId]
     );
@@ -175,7 +175,7 @@ export default function App() {
   };
 
   const handleNotificationAction = (notification: Notification, action: string) => {
-    setNotifications(prev => prev.map(n =>
+    setNotifications(prev => prev.map(n => 
       n.id === notification.id ? { ...n, isRead: true } : n
     ));
   };
@@ -191,7 +191,7 @@ export default function App() {
   // Calculate unread notification count
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  return (
+        return (
     <Router>
       <div className="h-screen bg-background flex flex-col max-w-md mx-auto relative">
         <div className="flex-1 overflow-hidden pb-16">
@@ -199,59 +199,59 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/restaurant/:id" element={
-              <RestaurantDetail
+          <RestaurantDetail 
                 onToggleFavorite={handleToggleFavorite}
                 favorites={favorites}
               />
             } />
             <Route path="/restaurant/:id/reviews" element={<AllReviewsPage />} />
             <Route path="/reservation/:id" element={
-              <ReservationPage
-                user={user}
+          <ReservationPage
+            user={user}
                 onUserUpdate={handleUserUpdate}
-              />
+          />
             } />
             <Route path="/bookings" element={<BookingList />} />
             <Route path="/bookings/:id" element={
-              <BookingDetail
+          <BookingDetail
                 onBookingUpdate={handleBookingUpdate}
-              />
+          />
             } />
             <Route path="/bookings/:id/edit" element={
-              <BookingEdit
+          <BookingEdit
                 onBookingUpdate={handleBookingUpdate}
-              />
+          />
             } />
             <Route path="/profile" element={
-              <ProfilePage
-                user={user}
+          <ProfilePage 
+            user={user} 
                 onUserUpdate={handleUserUpdate}
-              />
+          />
             } />
             <Route path="/profile/edit" element={
-              <UserEditPage
-                user={user}
-                onSave={handleUserUpdate}
+          <UserEditPage
+            user={user}
+            onSave={handleUserUpdate}
               />
             } />
             <Route path="/notifications" element={
-              <NotificationPage
-                notifications={notifications}
-                onNotificationAction={handleNotificationAction}
-                onMarkAllAsRead={handleMarkAllAsRead}
-                onNotificationSettings={handleNotificationSettings}
-              />
+          <NotificationPage 
+            notifications={notifications} 
+            onNotificationAction={handleNotificationAction}
+            onMarkAllAsRead={handleMarkAllAsRead}
+            onNotificationSettings={handleNotificationSettings}
+          />
             } />
             <Route path="/search" element={<div className="p-4">검색 페이지 (구현 중)</div>} />
             <Route path="/favorites" element={<div className="p-4">찜한 식당 페이지 (구현 중)</div>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </div>
+      </div>
         <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50">
-          <BottomNavigation
-            notificationCount={unreadCount}
-          />
-        </div>
+      <BottomNavigation 
+        notificationCount={unreadCount}
+      />
+    </div>
       </div>
     </Router>
   );

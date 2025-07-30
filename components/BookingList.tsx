@@ -72,37 +72,37 @@ const mockBookings: Booking[] = [
 const getStatusInfo = (status: Booking['status']) => {
   switch (status) {
     case 'confirmed':
-      return {
-        label: '확정',
-        color: 'bg-green-500',
+      return { 
+        label: '확정', 
+        color: 'bg-green-500', 
         textColor: 'text-green-700',
         bgColor: 'bg-green-50 border-green-200'
       };
     case 'pending':
-      return {
-        label: '대기',
-        color: 'bg-yellow-500',
+      return { 
+        label: '대기', 
+        color: 'bg-yellow-500', 
         textColor: 'text-yellow-700',
         bgColor: 'bg-yellow-50 border-yellow-200'
       };
     case 'completed':
-      return {
-        label: '완료',
-        color: 'bg-gray-500',
+      return { 
+        label: '완료', 
+        color: 'bg-gray-500', 
         textColor: 'text-gray-700',
         bgColor: 'bg-gray-50 border-gray-200'
       };
     case 'cancelled':
-      return {
-        label: '취소',
-        color: 'bg-red-500',
+      return { 
+        label: '취소', 
+        color: 'bg-red-500', 
         textColor: 'text-red-700',
         bgColor: 'bg-red-50 border-red-200'
       };
     default:
-      return {
-        label: '알 수 없음',
-        color: 'bg-gray-500',
+      return { 
+        label: '알 수 없음', 
+        color: 'bg-gray-500', 
         textColor: 'text-gray-700',
         bgColor: 'bg-gray-50 border-gray-200'
       };
@@ -113,10 +113,10 @@ export function BookingList() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('upcoming');
 
-  const upcomingBookings = mockBookings.filter(b =>
+  const upcomingBookings = mockBookings.filter(b => 
     b.status === 'confirmed' || b.status === 'pending'
   );
-  const pastBookings = mockBookings.filter(b =>
+  const pastBookings = mockBookings.filter(b => 
     b.status === 'completed' || b.status === 'cancelled'
   );
 
@@ -134,7 +134,7 @@ export function BookingList() {
 
   const renderBookingCard = (booking: Booking) => {
     const statusInfo = getStatusInfo(booking.status);
-
+    
     return (
       <Card key={booking.id} className={`p-4 ${statusInfo.bgColor}`}>
         <div className="space-y-3">
@@ -188,25 +188,25 @@ export function BookingList() {
           <div className="flex space-x-2 pt-2">
             {booking.status === 'confirmed' || booking.status === 'pending' ? (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   className="flex-1"
                   onClick={() => handleBookingSelect(booking)}
                 >
                   상세보기
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   className="flex-1"
                   onClick={() => handleBookingEdit(booking)}
                 >
                   수정
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   className="text-red-600 hover:text-red-700"
                   onClick={() => confirm(`${booking.restaurantName} 예약을 취소하시겠습니까?`)}
                 >
@@ -215,25 +215,25 @@ export function BookingList() {
               </>
             ) : booking.status === 'completed' ? (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   className="flex-1"
                   onClick={() => handleBookingSelect(booking)}
                 >
                   상세보기
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   className="flex-1"
                   onClick={() => alert(`${booking.restaurantName} 재예약을 진행합니다.`)}
                 >
                   재예약
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   className="flex items-center"
                   onClick={() => alert(`${booking.restaurantName} 리뷰 작성 페이지로 이동합니다.`)}
                 >
@@ -243,17 +243,17 @@ export function BookingList() {
               </>
             ) : (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   className="flex-1"
                   onClick={() => alert(`${booking.restaurantName} 재예약을 진행합니다.`)}
                 >
                   재예약하기
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   className="text-red-600"
                   onClick={() => confirm(`${booking.restaurantName} 예약 기록을 삭제하시겠습니까?`)}
                 >
@@ -287,77 +287,77 @@ export function BookingList() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
           <div className="px-4 pt-4 pb-2">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="upcoming">진행중</TabsTrigger>
-              <TabsTrigger value="past">완료</TabsTrigger>
-              <TabsTrigger value="cancelled">취소</TabsTrigger>
-            </TabsList>
+            <TabsTrigger value="upcoming">진행중</TabsTrigger>
+            <TabsTrigger value="past">완료</TabsTrigger>
+            <TabsTrigger value="cancelled">취소</TabsTrigger>
+          </TabsList>
           </div>
 
           <div className="flex-1 overflow-y-auto">
             <TabsContent value="upcoming" className="p-4 pb-10 space-y-4 mt-4 h-full">
-              {upcomingBookings.length > 0 ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-medium">예정된 예약</h2>
-                    <Badge variant="secondary">{upcomingBookings.length}건</Badge>
-                  </div>
-                  <div className="space-y-3">
-                    {upcomingBookings.map(renderBookingCard)}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-12">
-                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">예정된 예약이 없습니다</p>
-                  <Button className="mt-4">새 예약 만들기</Button>
+            {upcomingBookings.length > 0 ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-medium">예정된 예약</h2>
+                  <Badge variant="secondary">{upcomingBookings.length}건</Badge>
                 </div>
-              )}
-            </TabsContent>
+                <div className="space-y-3">
+                  {upcomingBookings.map(renderBookingCard)}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">예정된 예약이 없습니다</p>
+                <Button className="mt-4">새 예약 만들기</Button>
+              </div>
+            )}
+          </TabsContent>
 
             <TabsContent value="past" className="p-4 pb-10 space-y-4 mt-4 h-full">
-              {pastBookings.filter(b => b.status === 'completed').length > 0 ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-medium">지난 예약</h2>
-                    <Badge variant="secondary">
-                      {pastBookings.filter(b => b.status === 'completed').length}건
-                    </Badge>
-                  </div>
-                  <div className="space-y-3">
-                    {pastBookings
-                      .filter(b => b.status === 'completed')
-                      .map(renderBookingCard)}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-12">
-                  <Star className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">완료된 예약이 없습니다</p>
+            {pastBookings.filter(b => b.status === 'completed').length > 0 ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-medium">지난 예약</h2>
+                  <Badge variant="secondary">
+                    {pastBookings.filter(b => b.status === 'completed').length}건
+                  </Badge>
                 </div>
-              )}
-            </TabsContent>
+                <div className="space-y-3">
+                  {pastBookings
+                    .filter(b => b.status === 'completed')
+                    .map(renderBookingCard)}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <Star className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">완료된 예약이 없습니다</p>
+              </div>
+            )}
+          </TabsContent>
 
             <TabsContent value="cancelled" className="p-4 pb-10 space-y-4 mt-4 h-full">
-              {pastBookings.filter(b => b.status === 'cancelled').length > 0 ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-medium">취소된 예약</h2>
-                    <Badge variant="secondary">
-                      {pastBookings.filter(b => b.status === 'cancelled').length}건
-                    </Badge>
-                  </div>
-                  <div className="space-y-3">
-                    {pastBookings
-                      .filter(b => b.status === 'cancelled')
-                      .map(renderBookingCard)}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">취소된 예약이 없습니다</p>
+            {pastBookings.filter(b => b.status === 'cancelled').length > 0 ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-medium">취소된 예약</h2>
+                  <Badge variant="secondary">
+                    {pastBookings.filter(b => b.status === 'cancelled').length}건
+                  </Badge>
                 </div>
-              )}
-            </TabsContent>
+                <div className="space-y-3">
+                  {pastBookings
+                    .filter(b => b.status === 'cancelled')
+                    .map(renderBookingCard)}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">취소된 예약이 없습니다</p>
+              </div>
+            )}
+          </TabsContent>
           </div>
         </Tabs>
       </div>
