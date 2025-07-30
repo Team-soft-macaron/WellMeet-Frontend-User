@@ -1,13 +1,10 @@
 import { API_ENDPOINTS, DEFAULT_MEMBER_ID } from '../constants/api';
-import type {
+import {
     Restaurant,
-    RestaurantDetail,
-    User,
     Booking,
     Notification,
-    Reservation,
-    ApiResponse,
-    SearchParams
+    User,
+    RestaurantDetail
 } from '../types/api';
 
 // Helper function to format distance
@@ -53,14 +50,14 @@ export const restaurantApi = {
         const data = await apiRequest<Restaurant[]>(url);
 
         // Format distance for each restaurant
-        return data.map((restaurant: Restaurant & { distance: number }) => ({
+        return data.map((restaurant: Restaurant) => ({
             ...restaurant,
-            distance: formatDistance(restaurant.distance)
+            distance: restaurant.distance ? formatDistance(parseFloat(restaurant.distance)) : '거리 정보 없음'
         }));
     },
 
     // Search restaurants
-    async search(params: SearchParams): Promise<Restaurant[]> {
+    async search(params: { query: string; latitude?: number; longitude?: number; category?: string; priceRange?: string }): Promise<Restaurant[]> {
         const queryParams = new URLSearchParams({
             query: params.query,
             ...(params.latitude && { latitude: params.latitude.toString() }),
@@ -159,24 +156,24 @@ export const bookingApi = {
 // Reservation API functions
 export const reservationApi = {
     // Get reservations list
-    async getReservations(): Promise<Reservation[]> {
+    async getReservations(): Promise<Booking[]> {
         const url = `${API_ENDPOINTS.RESERVATIONS.LIST}?memberId=${DEFAULT_MEMBER_ID}`;
-        return apiRequest<Reservation[]>(url);
+        return apiRequest<Booking[]>(url);
     },
 
     // Create reservation
-    async createReservation(reservationData: Partial<Reservation>): Promise<Reservation> {
+    async createReservation(reservationData: Partial<Booking>): Promise<Booking> {
         const url = `${API_ENDPOINTS.RESERVATIONS.CREATE}?memberId=${DEFAULT_MEMBER_ID}`;
-        return apiRequest<Reservation>(url, {
+        return apiRequest<Booking>(url, {
             method: 'POST',
             body: JSON.stringify(reservationData),
         });
     },
 
     // Update reservation
-    async updateReservation(id: string, reservationData: Partial<Reservation>): Promise<Reservation> {
+    async updateReservation(id: string, reservationData: Partial<Booking>): Promise<Booking> {
         const url = `${API_ENDPOINTS.RESERVATIONS.UPDATE(id)}?memberId=${DEFAULT_MEMBER_ID}`;
-        return apiRequest<Reservation>(url, {
+        return apiRequest<Booking>(url, {
             method: 'PUT',
             body: JSON.stringify(reservationData),
         });

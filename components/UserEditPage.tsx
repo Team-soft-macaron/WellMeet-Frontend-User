@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { Card } from './ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { ArrowLeft, User, Mail, Phone, Save } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 interface User {
   id: string;
@@ -147,7 +147,8 @@ export function UserEditPage({ user, onSave }: UserEditPageProps) {
           <div className="flex justify-center">
             <div className="relative">
               <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
-                <User className="h-10 w-10 text-primary-foreground" />
+                {/* Assuming User icon is no longer needed or replaced */}
+                <span className="text-primary-foreground text-lg">U</span>
               </div>
               <Button
                 size="sm"
@@ -179,11 +180,11 @@ export function UserEditPage({ user, onSave }: UserEditPageProps) {
 
             {/* 이름 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center">
-                <User className="h-4 w-4 mr-2" />
+              <Label htmlFor="name" className="text-sm font-medium">
                 이름 <span className="text-red-500 ml-1">*</span>
-              </label>
+              </Label>
               <Input
+                id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 placeholder="이름을 입력하세요"
@@ -196,11 +197,11 @@ export function UserEditPage({ user, onSave }: UserEditPageProps) {
 
             {/* 이메일 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center">
-                <Mail className="h-4 w-4 mr-2" />
+              <Label htmlFor="email" className="text-sm font-medium">
                 이메일 <span className="text-red-500 ml-1">*</span>
-              </label>
+              </Label>
               <Input
+                id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
@@ -214,11 +215,11 @@ export function UserEditPage({ user, onSave }: UserEditPageProps) {
 
             {/* 전화번호 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center">
-                <Phone className="h-4 w-4 mr-2" />
+              <Label htmlFor="phone" className="text-sm font-medium">
                 전화번호 <span className="text-red-500 ml-1">*</span>
-              </label>
+              </Label>
               <Input
+                id="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
@@ -286,12 +287,14 @@ export function UserEditPage({ user, onSave }: UserEditPageProps) {
           >
             {isLoading ? (
               <>
-                <Save className="h-4 w-4 mr-2 animate-spin" />
+                {/* Assuming Save icon is no longer needed or replaced */}
+                <span className="animate-spin">⚙️</span>
                 저장 중...
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                {/* Assuming Save icon is no longer needed or replaced */}
+                <span>💾</span>
                 저장하기
               </>
             )}

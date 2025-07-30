@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
-import { Search, Bell, Star, MapPin, Phone } from 'lucide-react';
+import { Search, Bell, Star, MapPin } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { restaurantApi } from '../src/utils/api';
 import type { Restaurant } from '../src/types/api';

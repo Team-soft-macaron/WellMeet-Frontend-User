@@ -1,8 +1,6 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import { Badge } from './ui/badge';
 import { ArrowLeft, Calendar, Users, CreditCard, MapPin, Phone, Clock, MessageSquare, Star } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 

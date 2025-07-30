@@ -17,11 +17,12 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 interface Restaurant {
   id: string;
   name: string;
-  category: string;
-  priceRange: string;
+  category?: string;
+  priceRange?: string;
   rating: number;
-  location: string;
-  image: string;
+  address: string;
+  image?: string;
+  phone?: string;
 }
 
 interface User {
@@ -245,7 +246,7 @@ export function ReservationPage({
                     ⭐ {restaurant.rating}
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    • {restaurant.location}
+                    • {restaurant.address}
                   </span>
                 </div>
               </div>
@@ -566,7 +567,7 @@ export function ReservationPage({
                   <Checkbox
                     id="sms"
                     checked={smsNotification}
-                    onCheckedChange={setSmsNotification}
+                    onCheckedChange={(checked) => setSmsNotification(checked === true)}
                   />
                   <label htmlFor="sms" className="text-sm">
                     SMS 알림 받기
@@ -576,7 +577,7 @@ export function ReservationPage({
                   <Checkbox
                     id="email"
                     checked={emailNotification}
-                    onCheckedChange={setEmailNotification}
+                    onCheckedChange={(checked) => setEmailNotification(checked === true)}
                   />
                   <label htmlFor="email" className="text-sm">
                     이메일 알림 받기
@@ -586,7 +587,7 @@ export function ReservationPage({
                   <Checkbox
                     id="reminder"
                     checked={reminderNotification}
-                    onCheckedChange={setReminderNotification}
+                    onCheckedChange={(checked) => setReminderNotification(checked === true)}
                   />
                   <label htmlFor="reminder" className="text-sm">
                     방문 3시간 전 리마인더
@@ -603,7 +604,7 @@ export function ReservationPage({
                 <Checkbox
                   id="policy"
                   checked={agreedToPolicy}
-                  onCheckedChange={setAgreedToPolicy}
+                  onCheckedChange={(checked) => setAgreedToPolicy(checked === true)}
                 />
                 <label htmlFor="policy" className="text-sm">
                   예약 정책 및 취소 규정에 동의{" "}
@@ -621,7 +622,7 @@ export function ReservationPage({
                 <Checkbox
                   id="privacy"
                   checked={agreedToPrivacy}
-                  onCheckedChange={setAgreedToPrivacy}
+                  onCheckedChange={(checked) => setAgreedToPrivacy(checked === true)}
                 />
                 <label htmlFor="privacy" className="text-sm">
                   개인정보 수집 및 이용에 동의{" "}
